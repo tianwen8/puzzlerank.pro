@@ -1,0 +1,34 @@
+# 404死链重定向配置
+# 游戏相关页面重定向到首页或相关功能
+/guides/best-starting-words /strategy 301
+/guides/5-letter-word-tips /strategy 301
+/guides/word-puzzle-strategy /strategy 301
+/guides/puzzle-ranking-system /guide/rankings 301
+/guides /strategy 301
+
+# 排名相关页面重定向
+/rankings/word-puzzle /guide/rankings 301
+/rankings/2048 /guide/rankings 301
+/rankings /guide/rankings 301
+/leaderboard /guide/rankings 301
+
+# 游戏页面重定向到首页（游戏在首页）
+/2048-game / 301
+/word-puzzle / 301
+
+# 统计相关重定向
+/statistics /guide/stats 301
+/player-stats /guide/stats 301
+
+# 功能页面重定向到相关页面
+/daily-challenge / 301
+/achievements / 301
+/tournaments / 301
+
+# 法律页面需要创建
+/terms-of-service /about 301
+/privacy-policy /about 301
+/contact /about 301
+
+# 邮件保护页面返回410
+/cdn-cgi/l/email-protection / 410

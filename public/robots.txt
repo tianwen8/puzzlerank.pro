@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /api/
+Allow: /_next/static/
+Allow: /api/games/
+Sitemap: https://puzzlerank.pro/sitemap.xml
+
+User-agent: GPTBot
+Disallow: /
