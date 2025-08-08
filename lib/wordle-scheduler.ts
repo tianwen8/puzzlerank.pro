@@ -346,7 +346,7 @@ export class WordleScheduler {
       await WordlePredictionDB.upsertPrediction({
         game_number: gameNumber,
         date: new Date().toISOString().split('T')[0],
-        predicted_word: null,
+        predicted_word: undefined,
         status: 'rejected' as const,
         confidence_score: 0,
         verification_sources: [],

@@ -1,0 +1,112 @@
+{
+  "predictions": [
+    {
+      "id": 1,
+      "game_number": 1511,
+      "date": "2025-08-08",
+      "predicted_word": "INFUS",
+      "verified_word": "INFUS",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["tomsguide"],
+      "hints": {
+        "category": "daily",
+        "difficulty": "confirmed",
+        "clues": ["Today's Wordle answer is INFUS"],
+        "letterHints": ["Starts with \"I\"", "Ends with \"S\""]
+      },
+      "created_at": "2025-08-08T05:43:00.000Z",
+      "updated_at": "2025-08-08T05:43:00.000Z"
+    },
+    {
+      "id": 2,
+      "game_number": 1510,
+      "date": "2025-08-07",
+      "predicted_word": "WORLD",
+      "verified_word": "WORLD",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["historical"],
+      "hints": {
+        "category": "historical",
+        "difficulty": "confirmed",
+        "clues": ["Historical answer #1510"],
+        "letterHints": []
+      },
+      "created_at": "2025-08-07T05:43:00.000Z",
+      "updated_at": "2025-08-07T05:43:00.000Z"
+    },
+    {
+      "id": 3,
+      "game_number": 1509,
+      "date": "2025-08-06",
+      "predicted_word": "HELLO",
+      "verified_word": "HELLO",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["historical"],
+      "hints": {
+        "category": "historical",
+        "difficulty": "confirmed",
+        "clues": ["Historical answer #1509"],
+        "letterHints": []
+      },
+      "created_at": "2025-08-06T05:43:00.000Z",
+      "updated_at": "2025-08-06T05:43:00.000Z"
+    },
+    {
+      "id": 4,
+      "game_number": 1508,
+      "date": "2025-08-05",
+      "predicted_word": "REACT",
+      "verified_word": "REACT",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["historical"],
+      "hints": {
+        "category": "historical",
+        "difficulty": "confirmed",
+        "clues": ["Historical answer #1508"],
+        "letterHints": []
+      },
+      "created_at": "2025-08-05T05:43:00.000Z",
+      "updated_at": "2025-08-05T05:43:00.000Z"
+    },
+    {
+      "id": 5,
+      "game_number": 1507,
+      "date": "2025-08-04",
+      "predicted_word": "GAMES",
+      "verified_word": "GAMES",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["historical"],
+      "hints": {
+        "category": "historical",
+        "difficulty": "confirmed",
+        "clues": ["Historical answer #1507"],
+        "letterHints": []
+      },
+      "created_at": "2025-08-04T05:43:00.000Z",
+      "updated_at": "2025-08-04T05:43:00.000Z"
+    },
+    {
+      "id": 6,
+      "game_number": 1506,
+      "date": "2025-08-03",
+      "predicted_word": "TYPES",
+      "verified_word": "TYPES",
+      "status": "verified",
+      "confidence_score": 1.0,
+      "verification_sources": ["historical"],
+      "hints": {
+        "category": "historical",
+        "difficulty": "confirmed",
+        "clues": ["Historical answer #1506"],
+        "letterHints": []
+      },
+      "created_at": "2025-08-03T05:43:00.000Z",
+      "updated_at": "2025-08-03T05:43:00.000Z"
+    }
+  ]
+}

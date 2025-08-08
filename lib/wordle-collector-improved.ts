@@ -106,13 +106,13 @@ export class WordleCollectorImproved {
       
     } catch (error) {
       const responseTime = Date.now() - startTime
-      console.log(`❌ ${source.name}: Failed - ${error.message} (${responseTime}ms)`)
+      console.log(`❌ ${source.name}: Failed - ${error instanceof Error ? error.message : String(error)} (${responseTime}ms)`)
       
       return {
         source: source.name,
         success: false,
         responseTime,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       }
     }
   }

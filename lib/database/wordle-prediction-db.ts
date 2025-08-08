@@ -1,7 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { WordlePredictionDBFallback } from './wordle-prediction-db-fallback'
 
 // 延迟初始化 Supabase 客户端
 let supabaseAdmin: any = null
+let fallbackDB: WordlePredictionDBFallback | null = null
 
 function getSupabaseClient() {
   if (!supabaseAdmin) {
@@ -9,13 +11,21 @@ function getSupabaseClient() {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase configuration. Please check your .env.local file.')
+      console.warn('Missing Supabase configuration, using fallback JSON storage')
+      return null
     }
     
     supabaseAdmin = createClient(supabaseUrl, supabaseKey)
   }
   
   return supabaseAdmin
+}
+
+function getFallbackDB() {
+  if (!fallbackDB) {
+    fallbackDB = new WordlePredictionDBFallback()
+  }
+  return fallbackDB
 }
 
 // 导出客户端获取函数
@@ -105,39 +115,63 @@ export class WordlePredictionDB {
   
   // 获取历史预测（已验证）
   static async getHistoryPredictions(limit = 20): Promise<WordlePrediction[]> {
-    const { data, error } = await getSupabaseClient()
-      .from('wordle_predictions')
-      .select('*')
-      .eq('status', 'verified')
-      .order('date', { ascending: false })
-      .limit(limit)
+    const supabase = getSupabaseClient()
     
-    if (error) {
-      console.error('Failed to get history predictions:', error)
-      return []
+    if (!supabase) {
+      // 使用 JSON 文件备用
+      return await getFallbackDB().getHistoryPredictions(limit)
     }
     
-    return data || []
+    try {
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('*')
+        .eq('status', 'verified')
+        .order('date', { ascending: false })
+        .limit(limit)
+      
+      if (error) {
+        console.error('Failed to get history predictions:', error)
+        return await getFallbackDB().getHistoryPredictions(limit)
+      }
+      
+      return data || []
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getHistoryPredictions(limit)
+    }
   }
   
   // 获取候选预测
   static async getCandidatePredictions(limit = 10): Promise<WordlePrediction[]> {
-    const today = new Date().toISOString().split('T')[0]
+    const supabase = getSupabaseClient()
     
-    const { data, error } = await getSupabaseClient()
-      .from('wordle_predictions')
-      .select('*')
-      .eq('status', 'candidate')
-      .gte('date', today)
-      .order('date', { ascending: true })
-      .limit(limit)
-    
-    if (error) {
-      console.error('Failed to get candidate predictions:', error)
-      return []
+    if (!supabase) {
+      // 使用 JSON 文件备用
+      return await getFallbackDB().getCandidatePredictions(limit)
     }
     
-    return data || []
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('*')
+        .eq('status', 'candidate')
+        .gte('date', today)
+        .order('date', { ascending: true })
+        .limit(limit)
+      
+      if (error) {
+        console.error('Failed to get candidate predictions:', error)
+        return await getFallbackDB().getCandidatePredictions(limit)
+      }
+      
+      return data || []
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getCandidatePredictions(limit)
+    }
   }
   
   // 创建或更新预测
@@ -239,24 +273,36 @@ export class WordlePredictionDB {
     candidates: number
     verificationRate: number
   }> {
-    const { data: totalData } = await getSupabaseClient()
-      .from('wordle_predictions')
-      .select('status')
+    const supabase = getSupabaseClient()
     
-    if (!totalData) {
-      return { total: 0, verified: 0, candidates: 0, verificationRate: 0 }
+    if (!supabase) {
+      // 使用 JSON 文件备用
+      return await getFallbackDB().getStats()
     }
     
-    const total = totalData.length
-    const verified = totalData.filter((p: any) => p.status === 'verified').length
-    const candidates = totalData.filter((p: any) => p.status === 'candidate').length
-    const verificationRate = total > 0 ? verified / total : 0
-    
-    return {
-      total,
-      verified,
-      candidates,
-      verificationRate
+    try {
+      const { data: totalData } = await supabase
+        .from('wordle_predictions')
+        .select('status')
+      
+      if (!totalData) {
+        return await getFallbackDB().getStats()
+      }
+      
+      const total = totalData.length
+      const verified = totalData.filter((p: any) => p.status === 'verified').length
+      const candidates = totalData.filter((p: any) => p.status === 'candidate').length
+      const verificationRate = total > 0 ? verified / total : 0
+      
+      return {
+        total,
+        verified,
+        candidates,
+        verificationRate
+      }
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getStats()
     }
   }
 }

@@ -103,13 +103,13 @@ let wordsCache: { [key: string]: boolean } = {};
 // Initialize word lists
 export const initializeWordLists = async () => {
   try {
-    // Import answers from word-master
+    // Import answers from word-master (array format)
     const answersModule = await import('../word-master/src/data/answers');
-    answersCache = answersModule.default;
+    answersCache = answersModule.default || [];
     
-    // Import words dictionary from word-master
+    // Import words dictionary from word-master (object format)
     const wordsModule = await import('../word-master/src/data/words');
-    wordsCache = wordsModule.default;
+    wordsCache = wordsModule.default || {};
     
     console.log(`Loaded ${answersCache.length} answers and ${Object.keys(wordsCache).length} words`);
   } catch (error) {

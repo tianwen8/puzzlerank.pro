@@ -85,7 +85,7 @@ export default function WordleAutomationAdmin() {
       
     } catch (error) {
       console.error('执行任务失败:', error);
-      alert(`任务执行失败: ${error.message}`);
+      alert(`任务执行失败: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setTaskRunning(null);
     }

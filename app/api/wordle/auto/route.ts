@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { WordlePredictionDB } from '@/lib/database/wordle-prediction-db'
-import { wordleScheduler } from '@/lib/wordle-scheduler'
-import { wordleVerifier } from '@/lib/wordle-verifier'
+import { getWordleScheduler } from '@/lib/wordle-scheduler'
+import { getWordleVerifier } from '@/lib/wordle-verifier'
 
 // GET - 获取自动化系统数据
 export async function GET(request: NextRequest) {
@@ -46,8 +46,9 @@ export async function GET(request: NextRequest) {
         
       case 'scheduler-status':
         // 获取调度器状态
-        const status = wordleScheduler.getStatus()
-        const taskHistory = wordleScheduler.getTaskHistory(5)
+        const scheduler = getWordleScheduler()
+        const status = scheduler.getStatus()
+        const taskHistory = scheduler.getTaskHistory(5)
         return NextResponse.json({
           success: true,
           data: {
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
     console.error('API错误:', error)
     return NextResponse.json({
       success: false,
-      error: error.message || '服务器内部错误'
+      error: error instanceof Error ? error.message : '服务器内部错误'
     }, { status: 500 })
   }
 }
@@ -89,7 +90,8 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'run-daily-collection':
         // 手动执行每日采集
-        const dailyResult = await wordleScheduler.runDailyCollection()
+        const scheduler1 = getWordleScheduler()
+        const dailyResult = await scheduler1.runDailyCollection()
         return NextResponse.json({
           success: true,
           data: dailyResult
@@ -97,7 +99,8 @@ export async function POST(request: NextRequest) {
         
       case 'run-hourly-verification':
         // 手动执行每小时验证
-        const hourlyResult = await wordleScheduler.runHourlyVerification()
+        const scheduler2 = getWordleScheduler()
+        const hourlyResult = await scheduler2.runHourlyVerification()
         return NextResponse.json({
           success: true,
           data: hourlyResult
@@ -106,7 +109,8 @@ export async function POST(request: NextRequest) {
       case 'run-historical-backfill':
         // 手动执行历史回填
         const { startGameNumber, endGameNumber } = params
-        const backfillResult = await wordleScheduler.runHistoricalBackfill(
+        const scheduler3 = getWordleScheduler()
+        const backfillResult = await scheduler3.runHistoricalBackfill(
           startGameNumber, 
           endGameNumber
         )
@@ -125,8 +129,9 @@ export async function POST(request: NextRequest) {
           }, { status: 400 })
         }
         
-        const verifyResult = await wordleVerifier.verifyTodayAnswer(gameNumber)
-        const updated = await wordleVerifier.updatePredictionInDatabase(verifyResult)
+        const verifier = getWordleVerifier()
+        const verifyResult = await verifier.verifyTodayAnswer(gameNumber)
+        const updated = await verifier.updatePredictionInDatabase(verifyResult)
         
         return NextResponse.json({
           success: true,
@@ -138,7 +143,8 @@ export async function POST(request: NextRequest) {
         
       case 'start-scheduler':
         // 启动调度器
-        await wordleScheduler.startScheduler()
+        const scheduler4 = getWordleScheduler()
+        await scheduler4.startScheduler()
         return NextResponse.json({
           success: true,
           message: '调度器已启动'
@@ -146,7 +152,8 @@ export async function POST(request: NextRequest) {
         
       case 'stop-scheduler':
         // 停止调度器
-        wordleScheduler.stopScheduler()
+        const scheduler5 = getWordleScheduler()
+        scheduler5.stopScheduler()
         return NextResponse.json({
           success: true,
           message: '调度器已停止'
@@ -163,7 +170,7 @@ export async function POST(request: NextRequest) {
     console.error('API错误:', error)
     return NextResponse.json({
       success: false,
-      error: error.message || '服务器内部错误'
+      error: error instanceof Error ? error.message : '服务器内部错误'
     }, { status: 500 })
   }
 }
@@ -202,7 +209,7 @@ export async function PUT(request: NextRequest) {
     console.error('API错误:', error)
     return NextResponse.json({
       success: false,
-      error: error.message || '服务器内部错误'
+      error: error instanceof Error ? error.message : '服务器内部错误'
     }, { status: 500 })
   }
 }

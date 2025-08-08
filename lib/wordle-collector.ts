@@ -87,7 +87,7 @@ export class WordleCollector {
       }
       
       const html = await response.text()
-      const word = this.extractWordFromHtml(html, source.selector_config)
+      const word = this.extractWordFromHtml(html, source.name)
       
       const responseTime = Date.now() - startTime
       
@@ -102,25 +102,23 @@ export class WordleCollector {
         }
       } else {
         throw new Error('Unable to extract answer from page')
-        throw new Error('Unable to extract answer from page')
       }
       
     } catch (error) {
       const responseTime = Date.now() - startTime
-      console.log(`❌ ${source.name}: Failed - ${(error as Error).message} (${responseTime}ms)`)
+      console.log(`❌ ${source.name}: Failed - ${error instanceof Error ? error.message : String(error)} (${responseTime}ms)`)
       
       return {
         source: source.name,
         success: false,
         responseTime,
-        error: (error as Error).message
+        error: error instanceof Error ? error.message : String(error)
       }
     }
   }
   
   // 构建请求URL
   private buildUrl(baseUrl: string, gameNumber: number): string {
-    // Most websites include date or game number in URL
     const today = new Date()
     const dateStr = today.toISOString().split('T')[0]
     
@@ -158,10 +156,10 @@ export class WordleCollector {
   }
   
   // Extract word from HTML
-  private extractWordFromHtml(html: string, config: any): string | null {
+  private extractWordFromHtml(html: string, sourceName: string): string | null {
     try {
       // 根据不同源使用不同的提取策略
-      const sourceSpecificPatterns = this.getSourceSpecificPatterns(source.name)
+      const sourceSpecificPatterns = this.getSourceSpecificPatterns(sourceName)
       
       // 尝试源特定的模式
       for (const pattern of sourceSpecificPatterns) {
@@ -169,13 +167,19 @@ export class WordleCollector {
         if (match && match[1]) {
           const word = match[1].toUpperCase()
           if (this.isValidWordleWord(word)) {
-            console.log(`Found answer using ${source.name} pattern: ${pattern} -> ${word}`)
+            console.log(`Found answer using ${sourceName} pattern: ${word}`)
             return word
           }
         }
       }
       
-      return null
+      // 通用提取模式
+      const patterns = [
+        /answer[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
+        /solution[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
+        /today's[^a-zA-Z]*wordle[^a-zA-Z]*answer[^a-zA-Z]*([A-Z]{5})/i,
+        /wordle[^a-zA-Z]*#\d+[^a-zA-Z]*answer[^a-zA-Z]*([A-Z]{5})/i
+      ]
       
       // 首先尝试精确模式匹配
       for (const pattern of patterns) {
@@ -183,7 +187,7 @@ export class WordleCollector {
         if (matches && matches[1]) {
           const word = matches[1].toUpperCase()
           if (this.isValidWordleWord(word)) {
-            console.log(`Found answer using pattern: ${pattern} -> ${word}`)
+            console.log(`Found answer using pattern: ${word}`)
             return word
           }
         }
@@ -240,31 +244,24 @@ export class WordleCollector {
     switch (sourceName.toLowerCase()) {
       case 'tomsguide':
         return [
-          // Tom's Guide: "Drumroll, please — it's IMBUE."
           /Drumroll[^a-zA-Z]*please[^a-zA-Z]*[—-][^a-zA-Z]*it's[^a-zA-Z]*([A-Z]{5})/i,
-          // 备用模式，以防格式变化
           /So[^a-zA-Z]*what[^a-zA-Z]*is[^a-zA-Z]*today's[^a-zA-Z]*Wordle[^a-zA-Z]*answer[^a-zA-Z]*for[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*Drumroll[^a-zA-Z]*please[^a-zA-Z]*[—-][^a-zA-Z]*it's[^a-zA-Z]*([A-Z]{5})/i
         ]
         
       case 'techradar':
         return [
-          // TechRadar: "Today's Wordle answer (game #1511) is... IMBUE."
           /Today's\s*Wordle\s*answer[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
-          // 备用模式
           /wordle\s*answer[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
         ]
         
       case 'wordtips':
         return [
-          // Word.tips: 需要特殊处理，因为答案是隐藏的
-          // 先尝试查找页面中可能泄露的答案信息
           /The\s*answer\s*for\s*today's\s*Wordle\s*on[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
           /answer[^a-zA-Z]*for[^a-zA-Z]*today's[^a-zA-Z]*Wordle[^a-zA-Z]*on[^a-zA-Z]*\w+[^a-zA-Z]*\d+[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
         ]
         
       default:
         return [
-          // 通用模式
           /answer[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
           /solution[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
         ]
@@ -302,7 +299,6 @@ export class WordleCollector {
 }
 
 // 导出单例
-// 延迟初始化的单例
 let wordleCollectorInstance: WordleCollector | null = null
 
 export function getWordleCollector(): WordleCollector {

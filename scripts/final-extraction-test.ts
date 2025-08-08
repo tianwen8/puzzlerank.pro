@@ -36,7 +36,7 @@ async function testFinalExtraction() {
       console.log('❌ Tom\'s Guide 未找到答案')
     }
   } catch (error) {
-    console.log(`❌ Tom's Guide 错误: ${error.message}`)
+    console.log(`❌ Rock Paper Shotgun 错误: ${error instanceof Error ? error.message : String(error)}`)
   }
   
   // 测试TechRadar
@@ -78,7 +78,7 @@ async function testFinalExtraction() {
       console.log('❌ TechRadar 页面中未找到IMBUE')
     }
   } catch (error) {
-    console.log(`❌ TechRadar 错误: ${error.message}`)
+    console.log(`❌ TechRadar 错误: ${error instanceof Error ? error.message : String(error)}`)
   }
   
   // 测试Word.tips
@@ -112,7 +112,7 @@ async function testFinalExtraction() {
       console.log('❌ Word.tips 未找到答案')
     }
   } catch (error) {
-    console.log(`❌ Word.tips 错误: ${error.message}`)
+    console.log(`❌ Word.tips 错误: ${error instanceof Error ? error.message : String(error)}`)
   }
   
   console.log('\n🎉 测试完成！')
