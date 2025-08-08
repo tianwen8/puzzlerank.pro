@@ -70,19 +70,33 @@ export interface CollectionLog {
 // 数据库操作类
 export class WordlePredictionDB {
   
+  // 计算游戏编号（统一的计算方法）
+  private static calculateGameNumber(date: string): number {
+    // 基于2025-08-07 = #1510计算（从Tom's Guide确认的正确编号）
+    const baseDate = new Date('2025-08-07');
+    const baseGameNumber = 1510;
+    
+    const targetDate = new Date(date);
+    const diffTime = targetDate.getTime() - baseDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    return baseGameNumber + diffDays;
+  }
+  
   // 获取今日预测
   static async getTodayPrediction(): Promise<WordlePrediction | null> {
     const today = new Date().toISOString().split('T')[0]
+    const todayGameNumber = this.calculateGameNumber(today)
     
     const { data, error } = await getSupabaseClient()
       .from('wordle_predictions')
       .select('*')
       .eq('date', today)
-      .eq('game_number', 1509) // 明确指定今天应该是 #1509
+      .eq('game_number', todayGameNumber)
       .single()
     
     if (error && error.code !== 'PGRST116') {
-      console.error('获取今日预测失败:', error)
+      console.error('Failed to get today prediction:', error)
       return null
     }
     
@@ -99,7 +113,7 @@ export class WordlePredictionDB {
       .limit(limit)
     
     if (error) {
-      console.error('获取历史预测失败:', error)
+      console.error('Failed to get history predictions:', error)
       return []
     }
     
@@ -119,7 +133,7 @@ export class WordlePredictionDB {
       .limit(limit)
     
     if (error) {
-      console.error('获取候选预测失败:', error)
+      console.error('Failed to get candidate predictions:', error)
       return []
     }
     
@@ -138,7 +152,7 @@ export class WordlePredictionDB {
       .single()
     
     if (error) {
-      console.error('创建/更新预测失败:', error)
+      console.error('Failed to create/update prediction:', error)
       return null
     }
     
@@ -168,7 +182,7 @@ export class WordlePredictionDB {
       .eq('game_number', gameNumber)
     
     if (error) {
-      console.error('更新预测状态失败:', error)
+      console.error('Failed to update prediction status:', error)
       return false
     }
     
@@ -184,7 +198,7 @@ export class WordlePredictionDB {
       .order('weight', { ascending: false })
     
     if (error) {
-      console.error('获取验证源失败:', error)
+      console.error('Failed to get verification sources:', error)
       return []
     }
     
@@ -198,7 +212,7 @@ export class WordlePredictionDB {
       .insert(log)
     
     if (error) {
-      console.error('记录采集日志失败:', error)
+      console.error('Failed to log collection:', error)
     }
   }
   
@@ -211,7 +225,7 @@ export class WordlePredictionDB {
       .single()
     
     if (error) {
-      console.error(`获取系统配置失败 (${key}):`, error)
+      console.error(`Failed to get system config (${key}):`, error)
       return null
     }
     

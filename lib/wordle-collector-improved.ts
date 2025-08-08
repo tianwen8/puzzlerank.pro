@@ -11,7 +11,7 @@ interface CollectionResult {
 }
 
 // Wordle答案采集器
-export class WordleCollector {
+export class WordleCollectorImproved {
   private sources: VerificationSource[] = []
   private maxRetries = 3
   private retryDelay = 5000
@@ -87,7 +87,7 @@ export class WordleCollector {
       }
       
       const html = await response.text()
-      const word = this.extractWordFromHtml(html, source.selector_config)
+      const word = this.extractWordFromHtml(html, source.name)
       
       const responseTime = Date.now() - startTime
       
@@ -102,25 +102,23 @@ export class WordleCollector {
         }
       } else {
         throw new Error('Unable to extract answer from page')
-        throw new Error('Unable to extract answer from page')
       }
       
     } catch (error) {
       const responseTime = Date.now() - startTime
-      console.log(`❌ ${source.name}: Failed - ${(error as Error).message} (${responseTime}ms)`)
+      console.log(`❌ ${source.name}: Failed - ${error.message} (${responseTime}ms)`)
       
       return {
         source: source.name,
         success: false,
         responseTime,
-        error: (error as Error).message
+        error: error.message
       }
     }
   }
   
   // 构建请求URL
   private buildUrl(baseUrl: string, gameNumber: number): string {
-    // Most websites include date or game number in URL
     const today = new Date()
     const dateStr = today.toISOString().split('T')[0]
     
@@ -157,120 +155,105 @@ export class WordleCollector {
     }
   }
   
-  // Extract word from HTML
-  private extractWordFromHtml(html: string, config: any): string | null {
+  // 改进的提取逻辑 - 根据不同源使用不同策略
+  private extractWordFromHtml(html: string, sourceName: string): string | null {
     try {
-      // 根据不同源使用不同的提取策略
-      const sourceSpecificPatterns = this.getSourceSpecificPatterns(source.name)
-      
-      // 尝试源特定的模式
-      for (const pattern of sourceSpecificPatterns) {
-        const match = html.match(pattern)
-        if (match && match[1]) {
-          const word = match[1].toUpperCase()
-          if (this.isValidWordleWord(word)) {
-            console.log(`Found answer using ${source.name} pattern: ${pattern} -> ${word}`)
-            return word
-          }
-        }
+      switch (sourceName) {
+        case 'tomsguide':
+          return this.extractFromTomsGuide(html)
+        case 'techradar':
+          return this.extractFromTechRadar(html)
+        case 'wordtips':
+          return this.extractFromWordTips(html)
+        default:
+          return this.extractGeneric(html)
       }
-      
-      return null
-      
-      // 首先尝试精确模式匹配
-      for (const pattern of patterns) {
-        const matches = html.match(pattern)
-        if (matches && matches[1]) {
-          const word = matches[1].toUpperCase()
-          if (this.isValidWordleWord(word)) {
-            console.log(`Found answer using pattern: ${pattern} -> ${word}`)
-            return word
-          }
-        }
-      }
-      
-      // 如果精确匹配失败，查找所有5字母单词，但更严格地验证
-      const allWords = html.match(/\b[A-Z]{5}\b/gi) || []
-      const validWords = []
-      
-      for (const word of allWords) {
-        const upperWord = word.toUpperCase()
-        if (this.isValidWordleWord(upperWord)) {
-          validWords.push(upperWord)
-        }
-      }
-      
-      // 如果只找到一个有效单词，返回它
-      if (validWords.length === 1) {
-        console.log(`Found single valid word: ${validWords[0]}`)
-        return validWords[0]
-      }
-      
-      // 如果找到多个，尝试根据上下文选择最可能的答案
-      if (validWords.length > 1) {
-        console.log(`Found multiple valid words: ${validWords.join(', ')}`)
-        
-        // 查找最接近"answer"关键词的单词
-        for (const word of validWords) {
-          const wordIndex = html.toUpperCase().indexOf(word)
-          const beforeText = html.substring(Math.max(0, wordIndex - 100), wordIndex).toLowerCase()
-          const afterText = html.substring(wordIndex, wordIndex + 100).toLowerCase()
-          
-          if (beforeText.includes('answer') || beforeText.includes('solution') || 
-              afterText.includes('answer') || afterText.includes('solution')) {
-            console.log(`Selected word based on context: ${word}`)
-            return word
-          }
-        }
-        
-        // 如果没有明确的上下文，返回第一个
-        return validWords[0]
-      }
-      
-      return null
-      
     } catch (error) {
-      console.error('Error extracting answer:', error)
+      console.error(`Error extracting answer from ${sourceName}:`, error)
       return null
     }
   }
   
-  // 获取针对特定源的提取模式
-  private getSourceSpecificPatterns(sourceName: string): RegExp[] {
-    switch (sourceName.toLowerCase()) {
-      case 'tomsguide':
-        return [
-          // Tom's Guide: "Drumroll, please — it's IMBUE."
-          /Drumroll[^a-zA-Z]*please[^a-zA-Z]*[—-][^a-zA-Z]*it's[^a-zA-Z]*([A-Z]{5})/i,
-          // 备用模式，以防格式变化
-          /So[^a-zA-Z]*what[^a-zA-Z]*is[^a-zA-Z]*today's[^a-zA-Z]*Wordle[^a-zA-Z]*answer[^a-zA-Z]*for[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*Drumroll[^a-zA-Z]*please[^a-zA-Z]*[—-][^a-zA-Z]*it's[^a-zA-Z]*([A-Z]{5})/i
-        ]
-        
-      case 'techradar':
-        return [
-          // TechRadar: "Today's Wordle answer (game #1511) is... IMBUE."
-          /Today's\s*Wordle\s*answer[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
-          // 备用模式
-          /wordle\s*answer[^a-zA-Z]*game[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
-        ]
-        
-      case 'wordtips':
-        return [
-          // Word.tips: 需要特殊处理，因为答案是隐藏的
-          // 先尝试查找页面中可能泄露的答案信息
-          /The\s*answer\s*for\s*today's\s*Wordle\s*on[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
-          /answer[^a-zA-Z]*for[^a-zA-Z]*today's[^a-zA-Z]*Wordle[^a-zA-Z]*on[^a-zA-Z]*\w+[^a-zA-Z]*\d+[^a-zA-Z]*#\d+[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
-        ]
-        
-      default:
-        return [
-          // 通用模式
-          /answer[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i,
-          /solution[^a-zA-Z]*is[^a-zA-Z]*([A-Z]{5})/i
-        ]
+  // Tom's Guide 特定提取逻辑
+  private extractFromTomsGuide(html: string): string | null {
+    const patterns = [
+      // 精确匹配 "Drumroll please &mdash; it's <strong>IMBUE</strong>"
+      /Drumroll\s*please\s*&mdash;\s*it's\s*<strong>([A-Z]{5})<\/strong>/i,
+      /Drumroll\s*please\s*—\s*it's\s*<strong>([A-Z]{5})<\/strong>/i,
+      /it's\s*<strong>([A-Z]{5})<\/strong>/i,
+    ]
+    
+    for (const pattern of patterns) {
+      const match = html.match(pattern)
+      if (match && this.isValidWordleWord(match[1])) {
+        console.log(`Found answer using Tom's Guide pattern: ${match[1]}`)
+        return match[1].toUpperCase()
+      }
     }
+    
+    return null
   }
-
+  
+  // TechRadar 特定提取逻辑
+  private extractFromTechRadar(html: string): string | null {
+    const patterns = [
+      // 匹配 "Today's Wordle answer (game #1511) is… <strong>IMBUE</strong>."
+      /Today's\s*Wordle\s*answer[^a-zA-Z]*game\s*#\d+[^a-zA-Z]*is[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+      /answer[^a-zA-Z]*game\s*#\d+[^a-zA-Z]*is[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+      /game\s*#\d+[^a-zA-Z]*is[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+    ]
+    
+    for (const pattern of patterns) {
+      const match = html.match(pattern)
+      if (match && this.isValidWordleWord(match[1])) {
+        console.log(`Found answer using TechRadar pattern: ${match[1]}`)
+        return match[1].toUpperCase()
+      }
+    }
+    
+    return null
+  }
+  
+  // Word.tips 特定提取逻辑
+  private extractFromWordTips(html: string): string | null {
+    const patterns = [
+      // 从JavaScript数据中提取 answer:"IMBUE"
+      /answer:"([A-Z]{5})"/i,
+      /"answer"\s*:\s*"([A-Z]{5})"/i,
+      /solutions:\[{[^}]*answer:"([A-Z]{5})"/i,
+    ]
+    
+    for (const pattern of patterns) {
+      const match = html.match(pattern)
+      if (match && this.isValidWordleWord(match[1])) {
+        console.log(`Found answer using Word.tips pattern: ${match[1]}`)
+        return match[1].toUpperCase()
+      }
+    }
+    
+    return null
+  }
+  
+  // 通用提取逻辑（作为后备）
+  private extractGeneric(html: string): string | null {
+    const patterns = [
+      // 通用答案模式
+      /answer[^a-zA-Z]*is[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+      /today[^a-zA-Z]*answer[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+      /wordle[^a-zA-Z]*answer[^a-zA-Z]*<strong>([A-Z]{5})<\/strong>/i,
+    ]
+    
+    for (const pattern of patterns) {
+      const match = html.match(pattern)
+      if (match && this.isValidWordleWord(match[1])) {
+        console.log(`Found answer using generic pattern: ${match[1]}`)
+        return match[1].toUpperCase()
+      }
+    }
+    
+    return null
+  }
+  
   // 验证是否为有效的Wordle单词
   private isValidWordleWord(word: string): boolean {
     if (!word || word.length !== 5) return false
@@ -279,7 +262,7 @@ export class WordleCollector {
     if (!/^[A-Z]+$/.test(word)) return false
     
     // 排除一些明显不是答案的词
-    const excludeWords = ['TODAY', 'WORDLE', 'ANSWER', 'GUESS', 'HINTS', 'CLUES', 'GAMES', 'WORDS', 'TILES', 'SCORE']
+    const excludeWords = ['TODAY', 'WORDLE', 'ANSWER', 'GUESS', 'HINTS', 'CLUES', 'HELLI']
     if (excludeWords.includes(word)) return false
     
     return true
@@ -301,20 +284,12 @@ export class WordleCollector {
   }
 }
 
-// 导出单例
-// 延迟初始化的单例
-let wordleCollectorInstance: WordleCollector | null = null
+// 导出改进版本的实例
+let wordleCollectorImprovedInstance: WordleCollectorImproved | null = null
 
-export function getWordleCollector(): WordleCollector {
-  if (!wordleCollectorInstance) {
-    wordleCollectorInstance = new WordleCollector()
+export function getWordleCollectorImproved(): WordleCollectorImproved {
+  if (!wordleCollectorImprovedInstance) {
+    wordleCollectorImprovedInstance = new WordleCollectorImproved()
   }
-  return wordleCollectorInstance
-}
-
-// 为了向后兼容，也导出一个getter
-export const wordleCollector = {
-  get instance() {
-    return getWordleCollector()
-  }
+  return wordleCollectorImprovedInstance
 }

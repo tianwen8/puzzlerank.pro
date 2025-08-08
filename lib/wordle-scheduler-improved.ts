@@ -14,41 +14,63 @@ interface TaskResult {
   timestamp: string
 }
 
-// Wordle调度器
-export class WordleScheduler {
+// 改进的Wordle调度器 - 支持UTC时区和准确的游戏编号计算
+export class WordleSchedulerImproved {
   private isRunning = false
   private taskHistory: TaskResult[] = []
+  private lastCollectionDate: string | null = null
   
-  // 获取当前游戏编号（基于UTC时间）
+  // 获取当前游戏编号（基于UTC时间，准确计算）
   private getCurrentGameNumber(): number {
-    // 手动校正：2025-08-08 应该是 #1511 (IMBUE)
-    const today = new Date()
-    const todayStr = today.toISOString().split('T')[0]
+    // 使用UTC时间确保全球一致性
+    const now = new Date()
+    const utcDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    const todayStr = utcDate.toISOString().split('T')[0]
     
+    // 手动校正：2025-08-08 应该是 #1511 (IMBUE)
     if (todayStr === '2025-08-08') {
       return 1511
     }
     
     // 基于 2025-08-08 = #1511 计算其他日期
-    const baseDate = new Date('2025-08-08')
+    const baseDate = new Date('2025-08-08T00:00:00.000Z')
     const baseGameNumber = 1511
-    const daysDiff = Math.floor((today.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24))
+    const daysDiff = Math.floor((utcDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24))
     
     return baseGameNumber + daysDiff
   }
   
-  // 每日采集任务（每天 00:01 执行）
+  // 检查是否应该执行每日采集（基于UTC时间）
+  private shouldRunDailyCollection(): boolean {
+    const now = new Date()
+    const utcDate = now.toISOString().split('T')[0]
+    
+    // 如果今天还没有采集过，且当前时间已过UTC 00:01
+    if (this.lastCollectionDate !== utcDate) {
+      const utcHours = now.getUTCHours()
+      const utcMinutes = now.getUTCMinutes()
+      
+      // UTC 00:01 之后可以开始采集
+      return utcHours > 0 || (utcHours === 0 && utcMinutes >= 1)
+    }
+    
+    return false
+  }
+  
+  // 每日采集任务（在UTC 00:01后执行）
   async runDailyCollection(): Promise<TaskResult> {
     const startTime = Date.now()
     const gameNumber = this.getCurrentGameNumber()
+    const utcDate = new Date().toISOString().split('T')[0]
     
-    console.log(`🕐 开始执行每日采集任务 - Wordle #${gameNumber}`)
+    console.log(`🕐 开始执行每日采集任务 - Wordle #${gameNumber} (UTC: ${utcDate})`)
     
     try {
       // 检查今日是否已有记录
       const existing = await WordlePredictionDB.getTodayPrediction()
       
-      if (existing && existing.status === 'verified') {
+      if (existing && existing.status === 'verified' && existing.game_number === gameNumber) {
+        this.lastCollectionDate = utcDate
         return {
           task: 'daily_collection',
           success: true,
@@ -72,6 +94,9 @@ export class WordleScheduler {
       if (!updated) {
         throw new Error('更新数据库失败')
       }
+      
+      // 标记今日已采集
+      this.lastCollectionDate = utcDate
       
       const taskResult: TaskResult = {
         task: 'daily_collection',
@@ -118,7 +143,7 @@ export class WordleScheduler {
       const existing = await WordlePredictionDB.getTodayPrediction()
       
       // 如果已经验证，跳过
-      if (existing && existing.status === 'verified') {
+      if (existing && existing.status === 'verified' && existing.game_number === gameNumber) {
         return {
           task: 'hourly_verification',
           success: true,
@@ -249,10 +274,13 @@ export class WordleScheduler {
     }
     
     this.isRunning = true
-    console.log('🚀 Wordle调度器启动')
+    console.log('🚀 改进版Wordle调度器启动 (基于UTC时区)')
     
-    // 立即执行一次每日采集
-    await this.runDailyCollection()
+    // 检查是否需要立即执行每日采集
+    if (this.shouldRunDailyCollection()) {
+      console.log('🎯 检测到需要执行每日采集，立即开始...')
+      await this.runDailyCollection()
+    }
     
     // 设置定时任务
     this.setupCronJobs()
@@ -261,30 +289,40 @@ export class WordleScheduler {
   // 停止调度器
   stopScheduler(): void {
     this.isRunning = false
-    console.log('🛑 Wordle调度器已停止')
+    console.log('🛑 改进版Wordle调度器已停止')
   }
   
-  // 设置定时任务
+  // 设置定时任务（基于UTC时间）
   private setupCronJobs(): void {
-    // 每日 00:01 执行采集任务
+    console.log('⏰ 设置基于UTC时区的定时任务')
+    
+    // 每分钟检查是否需要执行每日采集
     setInterval(async () => {
       if (!this.isRunning) return
       
-      const now = new Date()
-      if (now.getHours() === 0 && now.getMinutes() === 1) {
+      if (this.shouldRunDailyCollection()) {
+        console.log('🎯 UTC时间检测：开始每日采集')
         await this.runDailyCollection()
       }
     }, 60000) // 每分钟检查一次
     
-    // 每小时执行验证任务
+    // 每小时执行验证任务（UTC整点）
     setInterval(async () => {
       if (!this.isRunning) return
       
       const now = new Date()
-      if (now.getMinutes() === 0) { // 整点执行
+      const utcMinutes = now.getUTCMinutes()
+      
+      if (utcMinutes === 0) { // UTC整点执行
+        console.log('🎯 UTC整点：开始每小时验证')
         await this.runHourlyVerification()
       }
     }, 60000) // 每分钟检查一次
+    
+    console.log('📅 定时任务设置完成:')
+    console.log('  - 每日采集: UTC 00:01 后自动执行')
+    console.log('  - 每小时验证: UTC 整点执行')
+    console.log('  - 当前UTC时间:', new Date().toISOString())
   }
   
   // 获取任务历史
@@ -298,12 +336,18 @@ export class WordleScheduler {
   getStatus(): {
     isRunning: boolean
     currentGameNumber: number
+    utcTime: string
+    lastCollectionDate: string | null
+    shouldCollectToday: boolean
     lastTask?: TaskResult
     totalTasks: number
   } {
     return {
       isRunning: this.isRunning,
       currentGameNumber: this.getCurrentGameNumber(),
+      utcTime: new Date().toISOString(),
+      lastCollectionDate: this.lastCollectionDate,
+      shouldCollectToday: this.shouldRunDailyCollection(),
       lastTask: this.taskHistory[this.taskHistory.length - 1],
       totalTasks: this.taskHistory.length
     }
@@ -365,20 +409,12 @@ export class WordleScheduler {
   }
 }
 
-// 导出单例
-// 延迟初始化的单例
-let wordleSchedulerInstance: WordleScheduler | null = null
+// 导出改进版单例
+let wordleSchedulerImprovedInstance: WordleSchedulerImproved | null = null
 
-export function getWordleScheduler(): WordleScheduler {
-  if (!wordleSchedulerInstance) {
-    wordleSchedulerInstance = new WordleScheduler()
+export function getWordleSchedulerImproved(): WordleSchedulerImproved {
+  if (!wordleSchedulerImprovedInstance) {
+    wordleSchedulerImprovedInstance = new WordleSchedulerImproved()
   }
-  return wordleSchedulerInstance
-}
-
-// 为了向后兼容，也导出一个getter
-export const wordleScheduler = {
-  get instance() {
-    return getWordleScheduler()
-  }
+  return wordleSchedulerImprovedInstance
 }

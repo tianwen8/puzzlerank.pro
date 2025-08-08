@@ -36,7 +36,7 @@ export class WordleVerifier {
   
   // 验证今日答案
   async verifyTodayAnswer(gameNumber: number): Promise<VerificationResult> {
-    console.log(`🔍 开始验证 Wordle #${gameNumber} 答案...`)
+    console.log(`🔍 Starting verification for Wordle #${gameNumber}...`)
     
     try {
       // 采集所有源的答案
@@ -67,11 +67,12 @@ export class WordleVerifier {
       }
       
       console.log(`✅ 验证完成: ${result.consensusWord || '未找到'} (${result.status}, ${Math.round(result.confidence * 100)}%)`)
+      console.log(`✅ Verification complete: ${result.consensusWord || 'Not found'} (${result.status}, ${Math.round(result.confidence * 100)}%)`)
       
       return result
       
     } catch (error) {
-      console.error('验证过程出错:', error)
+      console.error('Verification process error:', error)
       
       return {
         gameNumber,
@@ -136,7 +137,7 @@ export class WordleVerifier {
     const sourceBonus = Math.min(sourceCount / successfulSources.length, 1) * 0.2
     const finalConfidence = Math.min(confidence + sourceBonus, 1)
     
-    console.log(`📊 共识分析: ${bestWord} (${Math.round(finalConfidence * 100)}%, ${sourceCount}/${successfulSources.length} 源)`)
+      console.log(`📊 Consensus analysis: ${bestWord} (${Math.round(finalConfidence * 100)}%, ${sourceCount}/${successfulSources.length} sources)`)
     
     return {
       word: bestWord,
@@ -144,9 +145,12 @@ export class WordleVerifier {
     }
   }
   
-  // 确定验证状态
+  // 确定验证状态 - 临时降低要求以处理源失效问题
   private determineStatus(confidence: number, sourceCount: number): 'candidate' | 'verified' | 'rejected' {
-    if (confidence >= this.minConfidenceThreshold && sourceCount >= this.minSourcesRequired) {
+    // 临时降低验证要求：1个高权重源也可以验证
+    if (confidence >= 0.8 && sourceCount >= 1) {
+      return 'verified'
+    } else if (confidence >= this.minConfidenceThreshold && sourceCount >= this.minSourcesRequired) {
       return 'verified'
     } else if (confidence > 0.3 && sourceCount >= 1) {
       return 'candidate'
@@ -182,14 +186,15 @@ export class WordleVerifier {
       
       if (saved) {
         console.log(`💾 数据库更新成功: #${result.gameNumber}`)
+        console.log(`💾 Database update successful: #${result.gameNumber}`)
         return true
       } else {
-        console.error('💾 数据库更新失败')
+        console.error('💾 Database update failed')
         return false
       }
       
     } catch (error) {
-      console.error('更新数据库时出错:', error)
+      console.error('Database update error:', error)
       return false
     }
   }
