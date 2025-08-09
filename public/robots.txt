@@ -7,6 +7,7 @@ Allow: /_next/static/
 Allow: /api/games/
 Allow: /todays-wordle-answer
 Allow: /daily-hints
+Allow: /
 Allow: /strategy
 Allow: /guide/
 Crawl-delay: 1
