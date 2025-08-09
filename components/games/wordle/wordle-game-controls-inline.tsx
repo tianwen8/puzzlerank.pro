@@ -64,7 +64,7 @@ export default function WordleGameControlsInline() {
                 New
               </Button>
               
-              <Link href="/daily-hints">
+              <Link href="/todays-wordle-answer">
                 <Button
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-3 md:px-4 py-1 md:py-2 font-semibold text-xs md:text-sm shadow-lg transition-all duration-200"
                   size="sm"

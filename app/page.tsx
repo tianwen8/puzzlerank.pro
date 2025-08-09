@@ -100,7 +100,7 @@ function GameContent() {
                   {/* Mobile Daily Hints Button */}
                   <div className="w-full max-w-xs flex-shrink-0 mx-auto mb-2">
                     <div className="flex justify-center">
-                      <a href="/daily-hints" className="inline-block">
+                      <a href="/todays-wordle-answer" className="inline-block">
                         <div className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-lg transition-all duration-200 flex items-center gap-2">
                           <span className="text-lg">💡</span>
                           <span>Today's Wordle Answer</span>

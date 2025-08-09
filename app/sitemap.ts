@@ -13,12 +13,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     
-    // Wordle Daily Hints - 核心功能页面，高优先级
+    // Today's Wordle Answer - 核心功能页面，最高优先级
+    {
+      url: `${baseUrl}/todays-wordle-answer`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    
+    // Legacy daily-hints redirect
     {
       url: `${baseUrl}/daily-hints`,
-      lastModified: currentDate,
+      lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9,
+      priority: 0.8,
     },
     
     // 策略页面

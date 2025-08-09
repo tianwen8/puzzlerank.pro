@@ -5,6 +5,7 @@ Disallow: /profile/
 Disallow: /api/
 Allow: /_next/static/
 Allow: /api/games/
+Allow: /todays-wordle-answer
 Allow: /daily-hints
 Allow: /strategy
 Allow: /guide/
