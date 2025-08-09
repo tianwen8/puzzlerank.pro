@@ -2,12 +2,13 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://puzzlerank.pro'
+  const currentDate = new Date()
   
   return [
     // 首页 - 最高优先级
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1.0,
     },
@@ -15,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Wordle Daily Hints - 核心功能页面，高优先级
     {
       url: `${baseUrl}/daily-hints`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.9,
     },
@@ -23,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 策略页面
     {
       url: `${baseUrl}/strategy`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
@@ -31,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 游戏指南页面
     {
       url: `${baseUrl}/guide/how-to-play`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
@@ -39,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 排名指南页面
     {
       url: `${baseUrl}/guide/rankings`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.7,
     },
@@ -47,7 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 统计指南页面
     {
       url: `${baseUrl}/guide/stats`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.7,
     },
@@ -55,9 +56,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 关于页面
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
+    },
+    
+    // 隐私政策
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: currentDate,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    
+    // 服务条款
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: currentDate,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
   ]
 }

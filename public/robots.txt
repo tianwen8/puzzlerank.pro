@@ -6,11 +6,40 @@ Disallow: /api/
 Allow: /_next/static/
 Allow: /api/games/
 Allow: /daily-hints
-Sitemap: https://puzzlerank.pro/sitemap.xml
+Allow: /strategy
+Allow: /guide/
+Crawl-delay: 1
 
+# 专门允许主要搜索引擎访问核心页面
+User-agent: Googlebot
+Allow: /
+Allow: /daily-hints
+Allow: /strategy
+Allow: /guide/
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Allow: /daily-hints
+Allow: /strategy
+Allow: /guide/
+Crawl-delay: 1
+
+# 阻止AI训练爬虫
 User-agent: GPTBot
 Disallow: /
 
-User-agent: Googlebot
-Allow: /daily-hints
-Allow: /
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# 网站地图
+Sitemap: https://puzzlerank.pro/sitemap.xml
