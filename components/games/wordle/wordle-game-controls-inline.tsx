@@ -70,7 +70,7 @@ export default function WordleGameControlsInline() {
                   size="sm"
                 >
                   <Lightbulb className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                  Hints
+                  Wordle Answers
                 </Button>
               </Link>
             </div>
