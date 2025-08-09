@@ -168,10 +168,10 @@ function GameContent() {
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white/5 rounded-lg p-6">
-              <h3 className="text-2xl font-semibold text-white mb-4">📝 Word Practice Challenge</h3>
+              <h3 className="text-2xl font-semibold text-white mb-4">📝 Unlimited Word Practice</h3>
               <p className="text-white/80 mb-4">
-                Challenge yourself with our <strong>unlimited word practice game</strong>! Similar to popular word games like wordle, 
-                guess hidden words in 6 tries across multiple difficulty levels. Features unlimited practice mode and comprehensive word statistics.
+                Challenge yourself with our <strong>unlimited word practice game</strong>! Guess 5-letter words in 6 tries across multiple difficulty levels. 
+                Features unlimited practice mode, infinite gameplay, and comprehensive word statistics for continuous improvement.
               </p>
               <ul className="text-white/70 text-sm space-y-1">
                 <li>✅ Unlimited practice mode</li>
@@ -243,7 +243,7 @@ function GameContent() {
                 <h2 className="text-2xl font-bold mb-4">🎮 About PuzzleRank.pro</h2>
                 <p className="text-white/90 mb-4">
                   PuzzleRank.pro is the ultimate online puzzle games platform featuring competitive leaderboards and ranking systems.
-                  Challenge yourself with wordle-style 5-letter word puzzles, classic 2048 number games, and more brain-training challenges.
+                  Challenge yourself with unlimited 5-letter word practice games, classic 2048 number games, and more brain-training challenges.
                   Our advanced algorithm tracks your performance across multiple game modes, providing detailed analytics to help improve your puzzle-solving skills.
                 </p>
                 <p className="text-white/90 mb-4">
@@ -298,7 +298,7 @@ function GameContent() {
                 <a href="/daily-hints" className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 rounded-lg p-3 text-center transition-colors border border-purple-300/30">
                   <div className="text-2xl mb-1">💡</div>
                   <div className="text-sm font-medium">Daily Hints</div>
-                  <div className="text-xs text-white/70 mt-1">Wordle Answers</div>
+                  <div className="text-xs text-white/70 mt-1">Daily Answers</div>
                 </a>
                 <a href="/strategy" className="bg-white/5 hover:bg-white/10 rounded-lg p-3 text-center transition-colors">
                   <div className="text-2xl mb-1">📚</div>

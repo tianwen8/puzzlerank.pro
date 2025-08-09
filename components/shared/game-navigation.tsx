@@ -13,7 +13,7 @@ export default function GameNavigation() {
   const games = [
     {
       id: 'wordle' as GameType,
-      name: 'Wordle',
+      name: 'Word Puzzle',
       icon: SpellCheck,
       description: 'Guess the 5-letter word',
       color: 'bg-green-500 hover:bg-green-600',

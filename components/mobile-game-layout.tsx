@@ -113,7 +113,7 @@ export default function MobileGameLayout({
               )}
             >
               <SpellCheck className="w-4 h-4" />
-              <span>Wordle</span>
+              <span>Word Puzzle</span>
             </button>
             <button
               onClick={() => handleGameSwitch('2048')}

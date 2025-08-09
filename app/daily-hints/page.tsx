@@ -154,14 +154,14 @@ export default function DailyHintsPage() {
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">Ready to play Wordle?</h3>
-              <p className="text-blue-100 text-sm">Use these hints to solve today's puzzle!</p>
+              <h3 className="text-lg font-semibold">Ready to play Word Puzzle?</h3>
+              <p className="text-blue-100 text-sm">Use these hints for unlimited practice!</p>
             </div>
             <Link 
               href="/"
               className="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
             >
-              Play Now →
+              Play Unlimited →
             </Link>
           </div>
         </div>
@@ -264,7 +264,7 @@ export default function DailyHintsPage() {
             href="/"
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
           >
-            Play Wordle →
+            Play Unlimited →
           </Link>
         </div>
         {historyHints.map((hint) => (
