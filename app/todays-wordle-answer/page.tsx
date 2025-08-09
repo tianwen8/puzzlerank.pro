@@ -82,11 +82,11 @@ export default function TodaysWordleAnswerPage() {
           answer: "NASAL",
           status: 'verified',
           confidence: 1.0,
-          hints: [
-            "This word relates to the nose area",
-            "Contains two vowels in specific positions",
-            "Common in medical and anatomy contexts"
-          ],
+            hints: [
+              "This word relates to a body part used for breathing",
+              "Contains the vowels A and A in different positions",
+              "Often used in medical terminology"
+            ],
           difficulty: 'Medium',
           letterFrequency: {},
           commonWords: [],
@@ -173,10 +173,13 @@ export default function TodaysWordleAnswerPage() {
                         Difficulty: {todayData.difficulty}
                       </Badge>
                     </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+                    <a 
+                      href="/?game=wordle&mode=infinite"
+                      className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg rounded-md font-medium transition-colors no-underline"
+                    >
                       <Play className="w-5 h-5 mr-2" />
                       Play Unlimited Practice
-                    </Button>
+                    </a>
                   </CardContent>
                 </Card>
 
@@ -314,7 +317,7 @@ export default function TodaysWordleAnswerPage() {
               <CardContent>
                 <div className="space-y-4">
                   {historyData.map((entry) => (
-                    <div key={entry.gameNumber} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div key={entry.gameNumber} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="text-sm text-gray-500">#{entry.gameNumber}</div>
                         <div className="font-mono text-lg font-bold text-gray-800">{entry.answer}</div>
@@ -322,11 +325,56 @@ export default function TodaysWordleAnswerPage() {
                           {entry.difficulty}
                         </Badge>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-gray-500">
+                          {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                        <a 
+                          href="/?game=wordle&mode=infinite"
+                          className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors no-underline"
+                        >
+                          Practice
+                        </a>
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* SEO Content for Recent Answers */}
+                <div className="mt-8 space-y-6">
+                  <Card className="bg-gradient-to-r from-green-50 to-blue-50">
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-800 mb-4">Master Previous Wordle Answers</h3>
+                      <p className="text-gray-600 mb-4">
+                        Study past Wordle solutions to improve your strategy. Each answer reveals patterns and letter combinations that can help you solve future puzzles more efficiently.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="flex items-start gap-3">
+                          <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-medium text-gray-800">Pattern Recognition</h4>
+                            <p className="text-sm text-gray-600">Learn common letter patterns from historical answers</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <Target className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-medium text-gray-800">Strategy Development</h4>
+                            <p className="text-sm text-gray-600">Develop better opening words and elimination tactics</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <a 
+                          href="/?game=wordle&mode=infinite"
+                          className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors no-underline"
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Practice with Unlimited Games
+                        </a>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
