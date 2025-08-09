@@ -76,6 +76,26 @@ export async function GET(request: NextRequest) {
         });
       
       case 'history':
+        // 优先使用新的自动化系统获取历史数据
+        try {
+          const historyData = await WordlePredictionDB.getRecentHistory(10);
+          if (historyData && historyData.length > 0) {
+            return NextResponse.json(
+              historyData.map(p => ({
+                gameNumber: p.gameNumber,
+                date: p.date,
+                word: p.answer,
+                status: p.status,
+                confidence: p.confidence,
+                verificationSources: p.verificationSources || []
+              }))
+            );
+          }
+        } catch (error) {
+          console.warn('新系统获取历史数据失败，使用备用系统:', error);
+        }
+        
+        // 备用：使用旧的硬编码系统
         const historyPredictions = getWordleHistory();
         return NextResponse.json(
           historyPredictions.map(p => ({
