@@ -5,7 +5,12 @@ Disallow: /profile/
 Disallow: /api/
 Allow: /_next/static/
 Allow: /api/games/
+Allow: /daily-hints
 Sitemap: https://puzzlerank.pro/sitemap.xml
 
 User-agent: GPTBot
 Disallow: /
+
+User-agent: Googlebot
+Allow: /daily-hints
+Allow: /

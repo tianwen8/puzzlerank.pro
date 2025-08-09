@@ -9,9 +9,9 @@ import { WebVitals } from "@/components/web-vitals"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "PuzzleRank.pro - Ultimate Puzzle Games with Global Rankings | Word Practice, 2048 & More",
-  description: "Master puzzle games at PuzzleRank.pro! Play unlimited word practice games, 2048, and brain games with real-time global rankings. Compete on leaderboards, track statistics, and climb the puzzle rankings. Free online puzzle platform.",
-  keywords: "puzzle ranking, word practice game, unlimited word puzzle, puzzle leaderboard, 2048 game, brain games ranking, online puzzles, puzzle competition, global rankings, puzzle statistics, word training, number puzzle",
+  title: "PuzzleRank.pro - Wordle Daily Hints & Puzzle Games with Global Rankings",
+  description: "Get daily Wordle hints and answers! Play unlimited word practice games, 2048, and brain games with real-time global rankings. Our smart Wordle prediction system provides verified daily hints and solutions. Free online puzzle platform.",
+  keywords: "wordle daily hints, wordle answers today, puzzle ranking, word practice game, unlimited word puzzle, puzzle leaderboard, 2048 game, brain games ranking, online puzzles, puzzle competition, global rankings, wordle solver, wordle help, daily wordle clues",
   authors: [{ name: "PuzzleRank Team" }],
   creator: "PuzzleRank.pro",
   publisher: "PuzzleRank.pro",
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "PuzzleRank.pro - Ultimate Puzzle Games with Global Rankings",
-    description: "Master unlimited word practice, 2048, and brain games with real-time global rankings and leaderboards. Compete, track stats, and climb the puzzle rankings!",
+    title: "PuzzleRank.pro - Wordle Daily Hints & Puzzle Games with Global Rankings",
+    description: "Get daily Wordle hints and verified answers! Play unlimited word practice, 2048, and brain games with real-time global rankings and leaderboards.",
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://puzzlerank.pro',
     siteName: "PuzzleRank.pro",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'PuzzleRank.pro - Ultimate Puzzle Games with Global Rankings',
+        alt: 'PuzzleRank.pro - Wordle Daily Hints & Puzzle Games with Global Rankings',
       },
     ],
     locale: 'en_US',
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "PuzzleRank.pro - Ultimate Puzzle Games with Global Rankings",
-    description: "Master word puzzles, 2048, and brain games with real-time global rankings and competitive leaderboards.",
+    title: "PuzzleRank.pro - Wordle Daily Hints & Puzzle Games",
+    description: "Get daily Wordle hints and verified answers! Master word puzzles, 2048, and brain games with global rankings.",
     images: ['/twitter-image.jpg'],
     creator: '@puzzlerankpro',
   },

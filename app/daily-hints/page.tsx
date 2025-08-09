@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 // 移除旧的硬编码系统导入
 // import { getTodayWordlePrediction, getWordleHistory, WordlePrediction } from '@/lib/wordle-prediction-system';
 import Link from 'next/link';
+import WordleHintsStructuredData from '@/components/wordle-hints-structured-data';
 
 interface HintData {
   gameNumber: number;
@@ -350,6 +351,12 @@ export default function DailyHintsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <WordleHintsStructuredData 
+        gameNumber={todayHint?.gameNumber}
+        date={todayHint?.date}
+        answer={todayHint?.word}
+        status={todayHint?.status}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Page header */}
         <div className="text-center mb-8">
