@@ -36,27 +36,27 @@ export default function TodaysWordleAnswerPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Use API calls instead of direct database access
-        const todayResponse = await fetch('/api/wordle/today')
-        const historyResponse = await fetch('/api/wordle/history?limit=7')
+        // Use correct API endpoints
+        const todayResponse = await fetch('/api/wordle?type=today')
+        const historyResponse = await fetch('/api/wordle?type=history')
         
         if (todayResponse.ok) {
           const today = await todayResponse.json()
           setTodayData({
             gameNumber: today.gameNumber,
             date: today.date,
-            answer: today.answer,
+            answer: today.word, // API returns 'word' not 'answer'
             status: today.status as 'verified' | 'predicted' | 'pending',
             confidence: today.confidence,
-            hints: today.hints || [
+            hints: today.hints?.clues || [
               "This word contains common vowels",
-              "Pay attention to letter positioning",
+              "Pay attention to letter positioning", 
               "Consider word patterns and frequency"
             ],
-            difficulty: today.difficulty as 'Easy' | 'Medium' | 'Hard' || 'Medium',
-            letterFrequency: today.letterFrequency || {},
-            commonWords: today.commonWords || [],
-            strategies: today.strategies || [
+            difficulty: today.hints?.difficulty === 'Medium' ? 'Medium' : 'Medium',
+            letterFrequency: {},
+            commonWords: [],
+            strategies: [
               "Start with vowel-rich words like ADIEU or AUDIO",
               "Use elimination strategy for consonants",
               "Consider letter frequency in English"
@@ -69,8 +69,8 @@ export default function TodaysWordleAnswerPage() {
           setHistoryData(history.map((item: any) => ({
             gameNumber: item.gameNumber,
             date: item.date,
-            answer: item.answer,
-            difficulty: item.difficulty as 'Easy' | 'Medium' | 'Hard' || 'Medium'
+            answer: item.word, // API returns 'word' not 'answer'
+            difficulty: 'Medium' as 'Easy' | 'Medium' | 'Hard'
           })))
         }
       } catch (error) {
