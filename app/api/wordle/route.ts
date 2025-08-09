@@ -78,16 +78,16 @@ export async function GET(request: NextRequest) {
       case 'history':
         // 优先使用新的自动化系统获取历史数据
         try {
-          const historyData = await WordlePredictionDB.getRecentHistory(10);
+          const historyData = await WordlePredictionDB.getHistoryPredictions(10);
           if (historyData && historyData.length > 0) {
             return NextResponse.json(
               historyData.map(p => ({
-                gameNumber: p.gameNumber,
+                gameNumber: p.game_number,
                 date: p.date,
-                word: p.answer,
+                word: p.verified_word || p.predicted_word,
                 status: p.status,
-                confidence: p.confidence,
-                verificationSources: p.verificationSources || []
+                confidence: p.confidence_score,
+                verificationSources: p.verification_sources || []
               }))
             );
           }
