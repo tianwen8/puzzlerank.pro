@@ -95,7 +95,7 @@ export default function Header() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-white">PuzzleRank</h1>
+              <div className="text-2xl font-bold text-white">PuzzleRank</div>
               <span className="text-white/60 text-sm">Ultimate Puzzle Games Platform</span>
             </div>
             <div className="w-20 h-10 bg-white/20 rounded animate-pulse" />
@@ -112,7 +112,7 @@ export default function Header() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-4">
-                <h1 className="text-2xl font-bold text-white">PuzzleRank</h1>
+                <div className="text-2xl font-bold text-white">PuzzleRank</div>
                 <span className="text-white/60 text-sm">Ultimate Puzzle Games Platform</span>
               </div>
 

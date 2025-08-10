@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Wordle Daily Hints & Answers Today | PuzzleRank.pro",
-  description: "Get today's Wordle hints and verified answers! Our smart prediction system provides daily Wordle clues, letter hints, and verified solutions from multiple sources. Never miss a Wordle puzzle again!",
-  keywords: "wordle hints today, wordle answer today, daily wordle clues, wordle help, wordle solver, wordle prediction, today's wordle, wordle daily hints, wordle letter hints, wordle verification",
+  title: "Daily Wordle Hints & Today's Answer - Updated Every Day",
+  description: "Get daily Wordle hints & today's answer! Smart prediction system with verified solutions, letter clues & unlimited practice. Updated every day.",
+  keywords: "daily wordle hints, wordle answer today, today's wordle answer, wordle hints today, wordle daily answer, wordle help today, daily wordle clues, wordle solver",
   openGraph: {
-    title: "Wordle Daily Hints & Answers Today | PuzzleRank.pro",
-    description: "Get today's Wordle hints and verified answers! Smart prediction system with daily clues and verified solutions.",
+    title: "Daily Wordle Hints & Today's Answer - Updated Every Day",
+    description: "Get daily Wordle hints & today's answer! Smart prediction system with verified solutions, letter clues & unlimited practice. Updated every day.",
     url: "/daily-hints",
     type: "website",
     images: [
@@ -14,14 +14,14 @@ export const metadata: Metadata = {
         url: "/wordle-hints-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Wordle Daily Hints System",
+        alt: "Daily Wordle Hints & Today's Answer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wordle Daily Hints & Answers Today",
-    description: "Get today's Wordle hints and verified answers with our smart prediction system!",
+    title: "Daily Wordle Hints & Today's Answer",
+    description: "Get daily Wordle hints & today's answer! Smart prediction system with verified solutions & unlimited practice.",
     images: ["/wordle-hints-twitter.jpg"],
   },
   alternates: {

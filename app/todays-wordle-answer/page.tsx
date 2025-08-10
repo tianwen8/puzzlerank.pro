@@ -123,10 +123,10 @@ export default function TodaysWordleAnswerPage() {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Today's Wordle Answer
+            Wordle Answer Today - Daily Solution & Hints Updated
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            Get the verified daily solution with hints and strategies
+            Get today's verified Wordle answer instantly! Daily solutions with hints, tips & unlimited practice updated every day.
           </p>
           {todayData && (
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
@@ -167,7 +167,7 @@ export default function TodaysWordleAnswerPage() {
                     </div>
                     <div className="flex items-center justify-center gap-4 mb-4">
                       <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Verified
+                        Today's Answer Verified
                       </Badge>
                       <Badge variant="outline">
                         Difficulty: {todayData.difficulty}

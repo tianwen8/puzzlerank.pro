@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Today's Wordle Answer - Daily Hints & Solutions | PuzzleRank.pro",
-  description: "Get today's Wordle answer instantly! Daily verified solutions, hints, and strategies for Wordle puzzle game. Updated every day with accurate answers and helpful tips.",
-  keywords: "today's wordle answer, wordle today, daily wordle solution, wordle hints today, wordle answer today, wordle help, daily puzzle answer",
+  title: "Wordle Answer Today - Daily Solution & Hints Updated",
+  description: "Get today's Wordle answer instantly! Daily solutions with hints, tips & unlimited practice. Updated every day with verified answers.",
+  keywords: "wordle answer today, today's wordle answer, daily wordle hints, wordle solutions, wordle daily answer, wordle help today, daily wordle clues, wordle solver",
   openGraph: {
-    title: "Today's Wordle Answer - Daily Hints & Solutions",
-    description: "Get today's Wordle answer instantly! Daily verified solutions, hints, and strategies for Wordle puzzle game.",
+    title: "Wordle Answer Today - Daily Solution & Hints Updated",
+    description: "Get today's Wordle answer instantly! Daily solutions with hints, tips & unlimited practice. Updated every day with verified answers.",
     url: '/todays-wordle-answer',
     type: 'article',
     images: [
@@ -14,14 +14,14 @@ export const metadata: Metadata = {
         url: '/wordle-answer-og.jpg',
         width: 1200,
         height: 630,
-        alt: "Today's Wordle Answer - Daily Solutions",
+        alt: "Wordle Answer Today - Daily Solution & Hints Updated",
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Today's Wordle Answer - Daily Hints & Solutions",
-    description: "Get today's Wordle answer instantly! Daily verified solutions and helpful tips.",
+    title: "Wordle Answer Today - Daily Solution & Hints",
+    description: "Get today's Wordle answer instantly! Daily solutions with hints, tips & unlimited practice. Updated every day.",
   },
   alternates: {
     canonical: '/todays-wordle-answer',

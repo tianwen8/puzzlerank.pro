@@ -145,16 +145,16 @@ function GameContent() {
         {!isMobile && (
         <div className="text-center mb-12 bg-white/10 backdrop-blur-sm rounded-2xl p-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Master Every <span className="text-yellow-300">Puzzle Game</span>
+            Today's <span className="text-yellow-300">Wordle Answer</span> & Daily Hints
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto">
-            Play <strong>2048</strong>, <strong>Word Practice Games</strong>, and more brain games on the ultimate puzzle ranking platform. 
-            Compete with millions of players worldwide, track your progress, and climb the global leaderboard!
+            Get <strong>today's Wordle answer</strong> with verified daily hints! Play <strong>unlimited word practice games</strong> and compete on global leaderboards. 
+            Fresh solutions updated every day with smart tips and strategies!
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-white/80">
-            <span className="bg-white/20 px-4 py-2 rounded-full">🧠 Brain Training</span>
+            <span className="bg-white/20 px-4 py-2 rounded-full">💡 Daily Wordle Answers</span>
             <span className="bg-white/20 px-4 py-2 rounded-full">🏆 Global Rankings</span>
-            <span className="bg-white/20 px-4 py-2 rounded-full">📊 Detailed Statistics</span>
+            <span className="bg-white/20 px-4 py-2 rounded-full">🎮 Unlimited Practice</span>
             <span className="bg-white/20 px-4 py-2 rounded-full">🆓 100% Free</span>
           </div>
         </div>
