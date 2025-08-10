@@ -2,6 +2,8 @@
 
 🎮 **Today's Wordle Answer & Daily Hints** - The ultimate puzzle gaming platform featuring Wordle daily answers, unlimited practice games, and global rankings.
 
+**Version**: 1.3.1 | **Last Updated**: August 10, 2025
+
 ## 🌟 Features
 
 - **📅 Daily Wordle Answers**: Get today's verified Wordle answer with hints and strategies
@@ -10,6 +12,8 @@
 - **💡 Smart Hints System**: AI-powered daily hints and solving strategies
 - **📱 Mobile Optimized**: Perfect responsive design for all devices
 - **🔄 Real-time Updates**: Fresh content updated every day automatically
+- **♿ Accessibility**: Improved heading structure and screen reader compatibility
+- **🔍 SEO Optimized**: Enhanced semantic HTML structure for better search visibility
 
 ## 🚀 Quick Start
 

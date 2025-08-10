@@ -256,7 +256,7 @@ function GameContent() {
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-4">🏆 Platform Features</h3>
+                <h2 className="text-xl font-bold mb-4">🏆 Platform Features</h2>
                 <ul className="space-y-2 text-white/90">
                   <li>• <strong>Global Rankings:</strong> Compete with players worldwide and climb the leaderboards</li>
                   <li>• <strong>Multiple Games:</strong> Word puzzles, number games, and brain training challenges</li>
@@ -271,21 +271,21 @@ function GameContent() {
             </div>
             
             <div className="mt-8 text-center">
-              <h3 className="text-xl font-bold mb-4">🎯 Why Choose PuzzleRank.pro?</h3>
+              <h2 className="text-xl font-bold mb-4">🎯 Why Choose PuzzleRank.pro?</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-2xl mb-2">🏆</div>
-                  <h4 className="font-semibold mb-2">Competitive Gaming</h4>
+                  <h3 className="font-semibold mb-2">Competitive Gaming</h3>
                   <p className="text-sm text-white/80">Join competitive puzzle tournaments, climb rankings, and prove your skills against the best players worldwide</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-2xl mb-2">🧩</div>
-                  <h4 className="font-semibold mb-2">Diverse Puzzles</h4>
+                  <h3 className="font-semibold mb-2">Diverse Puzzles</h3>
                   <p className="text-sm text-white/80">Word puzzles, number games, and logic challenges for all skill levels with increasing difficulty</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-2xl mb-2">📱</div>
-                  <h4 className="font-semibold mb-2">Anytime, Anywhere</h4>
+                  <h3 className="font-semibold mb-2">Anytime, Anywhere</h3>
                   <p className="text-sm text-white/80">Perfect mobile adaptation, enjoy puzzle games on any device with seamless synchronization</p>
                 </div>
               </div>
@@ -293,7 +293,7 @@ function GameContent() {
 
             {/* 内链导航组件 */}
             <div className="mt-8 border-t border-white/20 pt-6">
-              <h3 className="text-xl font-bold mb-4 text-center">🔗 Explore More</h3>
+              <h2 className="text-xl font-bold mb-4 text-center">🔗 Explore More</h2>
               <nav className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <a href="/daily-hints" className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 rounded-lg p-3 text-center transition-colors border border-purple-300/30">
                   <div className="text-2xl mb-1">💡</div>

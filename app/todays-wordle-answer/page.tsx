@@ -189,7 +189,7 @@ export default function TodaysWordleAnswerPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Lightbulb className="w-5 h-5 text-yellow-500" />
-                        Today's Hints
+                        <h2 className="text-xl font-semibold">Today's Hints</h2>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -210,7 +210,7 @@ export default function TodaysWordleAnswerPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Target className="w-5 h-5 text-red-500" />
-                        Winning Strategies
+                        <h2 className="text-xl font-semibold">Winning Strategies</h2>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -262,33 +262,33 @@ export default function TodaysWordleAnswerPage() {
                     </div>
 
                     <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-lg">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-4">Why Our Answers Are Reliable</h3>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4">Why Our Answers Are Reliable</h2>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="flex items-start gap-3">
                           <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Daily Verification</h4>
+                            <h3 className="font-medium text-gray-800">Daily Verification</h3>
                             <p className="text-sm text-gray-600">Every answer is verified against official Wordle sources</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-3">
                           <TrendingUp className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Real-time Updates</h4>
+                            <h3 className="font-medium text-gray-800">Real-time Updates</h3>
                             <p className="text-sm text-gray-600">Answers updated immediately when available</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-3">
                           <Users className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Community Trusted</h4>
+                            <h3 className="font-medium text-gray-800">Community Trusted</h3>
                             <p className="text-sm text-gray-600">Thousands of players rely on our daily solutions</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-3">
                           <Target className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Strategy Included</h4>
+                            <h3 className="font-medium text-gray-800">Strategy Included</h3>
                             <p className="text-sm text-gray-600">Get hints and tips to improve your game</p>
                           </div>
                         </div>
@@ -344,7 +344,7 @@ export default function TodaysWordleAnswerPage() {
                 <div className="mt-8 space-y-6">
                   <Card className="bg-gradient-to-r from-green-50 to-blue-50">
                     <CardContent className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-4">Master Previous Wordle Answers</h3>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4">Master Previous Wordle Answers</h2>
                       <p className="text-gray-600 mb-4">
                         Study past Wordle solutions to improve your strategy. Each answer reveals patterns and letter combinations that can help you solve future puzzles more efficiently.
                       </p>
@@ -352,14 +352,14 @@ export default function TodaysWordleAnswerPage() {
                         <div className="flex items-start gap-3">
                           <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Pattern Recognition</h4>
+                            <h3 className="font-medium text-gray-800">Pattern Recognition</h3>
                             <p className="text-sm text-gray-600">Learn common letter patterns from historical answers</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-3">
                           <Target className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="font-medium text-gray-800">Strategy Development</h4>
+                            <h3 className="font-medium text-gray-800">Strategy Development</h3>
                             <p className="text-sm text-gray-600">Develop better opening words and elimination tactics</p>
                           </div>
                         </div>

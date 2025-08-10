@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2025-08-10
+
+### Fixed
+- **SEO Structure**: Fixed H1/H2 heading hierarchy across all pages for better SEO compliance
+- **Accessibility**: Improved heading structure for screen readers and web accessibility
+- **Content Organization**: Corrected heading levels to follow proper semantic structure (H1 → H2 → H3)
+
+### Enhanced
+- **Page Structure**: Optimized heading hierarchy in main pages:
+  - `app/page.tsx`: Fixed heading levels for better content organization
+  - `app/todays-wordle-answer/page.tsx`: Corrected section headings and subheadings
+  - All guide pages now follow proper heading hierarchy
+- **SEO Optimization**: Improved semantic HTML structure for better search engine understanding
+- **Web Standards**: Enhanced compliance with HTML5 semantic standards
+
+### Technical
+- **Code Quality**: Updated heading tags to follow proper nesting order
+- **Documentation**: Updated project documentation with latest changes
+- **Version Control**: Improved commit structure and change tracking
+
+## [1.3.0] - 2025-08-10
+
+### Added
+- **Comprehensive Documentation**: Complete project replication guide in README
+- **Database Schema**: Detailed database setup and migration instructions
+- **Core Components Documentation**: Scheduler, collector, verifier, database layer docs
+- **Troubleshooting Guide**: Common issues and solutions
+- **Deployment Guide**: Vercel and other platforms deployment instructions
+- **SEO Implementation**: Complete SEO optimization and performance features
+- **Contribution Guidelines**: Development and maintenance procedures
+
+### Enhanced
+- **README Structure**: Reorganized for better readability and completeness
+- **Setup Instructions**: Step-by-step project replication guide
+- **Technical Documentation**: Detailed component and system architecture
+- **Performance Optimization**: Documentation for speed and SEO improvements
+
 ## [1.2.0] - 2025-01-12
 
 ### Fixed
