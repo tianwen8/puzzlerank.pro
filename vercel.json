@@ -1,0 +1,33 @@
+{
+  "crons": [
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect", 
+      "schedule": "30 22 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "30 23 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "30 0 * * *"
+    }
+  ],
+  "functions": {
+    "app/api/wordle/auto-collect/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

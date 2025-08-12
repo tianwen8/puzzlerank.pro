@@ -7,17 +7,16 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CheckCircle, Clock, Lightbulb, History, Play, TrendingUp, Users, Target, BookOpen } from 'lucide-react'
 import WordleHintsStructuredData from '@/components/wordle-hints-structured-data'
+import WordleAnswerHints from '@/components/wordle-answer-hints'
+import { WordleHints } from '@/lib/supabase/types'
 
 interface WordleData {
   gameNumber: number
   date: string
   answer: string
-  status: 'verified' | 'predicted' | 'pending'
+  status: 'verified' | 'candidate' | 'rejected'
   confidence: number
-  hints: string[]
-  difficulty: 'Easy' | 'Medium' | 'Hard'
-  letterFrequency: { [key: string]: number }
-  commonWords: string[]
+  hints: WordleHints
   strategies: string[]
 }
 
@@ -34,62 +33,95 @@ export default function TodaysWordleAnswerPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadData = async () => {
+  const loadData = async () => {
       try {
-        // Use correct API endpoints
-        const todayResponse = await fetch('/api/wordle?type=today')
-        const historyResponse = await fetch('/api/wordle?type=history')
+        // Use new auto-collect API endpoint
+        const todayResponse = await fetch('/api/wordle/auto?type=today')
+        const historyResponse = await fetch('/api/wordle/auto?type=history')
         
         if (todayResponse.ok) {
-          const today = await todayResponse.json()
-          setTodayData({
-            gameNumber: today.gameNumber,
-            date: today.date,
-            answer: today.word, // API returns 'word' not 'answer'
-            status: today.status as 'verified' | 'predicted' | 'pending',
-            confidence: today.confidence,
-            hints: today.hints?.clues || [
-              "This word contains common vowels",
-              "Pay attention to letter positioning", 
-              "Consider word patterns and frequency"
-            ],
-            difficulty: today.hints?.difficulty === 'Medium' ? 'Medium' : 'Medium',
-            letterFrequency: {},
-            commonWords: [],
-            strategies: [
-              "Start with vowel-rich words like ADIEU or AUDIO",
-              "Use elimination strategy for consonants",
-              "Consider letter frequency in English"
-            ]
-          })
+          const todayResult = await todayResponse.json()
+          if (todayResult.success && todayResult.data) {
+            const today = todayResult.data
+            const answer = today.verified_word || today.predicted_word || 'UNKNOWN'
+            
+            // Generate hints if not available or incomplete
+            const generateDefaultHints = (word: string): WordleHints => {
+              const vowels = word.split('').filter(char => 'AEIOU'.includes(char))
+              const consonants = word.split('').filter(char => /[A-Z]/.test(char) && !'AEIOU'.includes(char))
+              
+              return {
+                firstLetter: word[0] || 'U',
+                length: word.length,
+                vowels: [...new Set(vowels)],
+                consonants: [...new Set(consonants)],
+                wordType: 'common word',
+                difficulty: 'Medium',
+                clues: [
+                  `This word starts with the letter ${word[0]}`,
+                  `This word contains ${vowels.length} vowel${vowels.length !== 1 ? 's' : ''}`,
+                  `This word has ${word.length} letters total`
+                ]
+              }
+            }
+            
+            let hints = today.hints
+            
+            // Check if hints is valid and complete
+            if (!hints || !hints.clues || !Array.isArray(hints.clues) || hints.clues.length === 0) {
+              hints = generateDefaultHints(answer)
+            }
+            
+            setTodayData({
+              gameNumber: today.game_number,
+              date: today.date,
+              answer: answer,
+              status: today.status as 'verified' | 'candidate' | 'rejected',
+              confidence: today.confidence_score || 1.0,
+              hints: hints,
+              strategies: [
+                "Start with vowel-rich words like ADIEU or AUDIO",
+                "Use elimination strategy for consonants",
+                "Consider letter frequency in English"
+              ]
+            })
+          }
         }
         
         if (historyResponse.ok) {
-          const history = await historyResponse.json()
-          setHistoryData(history.map((item: any) => ({
-            gameNumber: item.gameNumber,
-            date: item.date,
-            answer: item.word, // API returns 'word' not 'answer'
-            difficulty: 'Medium' as 'Easy' | 'Medium' | 'Hard'
-          })))
+          const historyResult = await historyResponse.json()
+          if (historyResult.success && historyResult.data) {
+            setHistoryData(historyResult.data.map((item: any) => ({
+              gameNumber: item.game_number,
+              date: item.date,
+              answer: item.verified_word || item.predicted_word || 'UNKNOWN',
+              difficulty: item.hints?.difficulty || 'Medium' as 'Easy' | 'Medium' | 'Hard'
+            })))
+          }
         }
       } catch (error) {
         console.error('Failed to load Wordle data:', error)
         // Fallback data for demo
+        const fallbackAnswer = "NOMAD"
         setTodayData({
-          gameNumber: 1512,
+          gameNumber: 1515,
           date: new Date().toISOString().split('T')[0],
-          answer: "NASAL",
+          answer: fallbackAnswer,
           status: 'verified',
           confidence: 1.0,
-            hints: [
-              "This word relates to a body part used for breathing",
-              "Contains the vowels A and A in different positions",
-              "Often used in medical terminology"
-            ],
-          difficulty: 'Medium',
-          letterFrequency: {},
-          commonWords: [],
+          hints: {
+            firstLetter: fallbackAnswer[0],
+            length: fallbackAnswer.length,
+            vowels: ['O', 'A'],
+            consonants: ['N', 'M', 'D'],
+            wordType: 'noun',
+            difficulty: 'Medium',
+            clues: [
+              "This word describes a person who moves from place to place",
+              "Contains common vowels O and A",
+              "Often associated with wandering or traveling lifestyle"
+            ]
+          },
           strategies: [
             "Start with vowel-rich words like ADIEU or AUDIO",
             "Use elimination strategy for consonants",
@@ -153,80 +185,37 @@ export default function TodaysWordleAnswerPage() {
           <TabsContent value="today" className="space-y-8">
             {todayData ? (
               <>
-                {/* Answer Card */}
-                <Card className="border-2 border-green-200 bg-green-50">
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-2xl text-green-800 flex items-center justify-center gap-2">
-                      <CheckCircle className="w-6 h-6" />
-                      Today's Verified Answer
+                {/* New Hints-based Answer Display */}
+                <WordleAnswerHints
+                  gameNumber={todayData.gameNumber}
+                  date={todayData.date}
+                  answer={todayData.answer}
+                  hints={todayData.hints}
+                  status={todayData.status}
+                  confidence={todayData.confidence}
+                />
+
+                {/* Strategies Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-red-500" />
+                      <h2 className="text-xl font-semibold">Winning Strategies</h2>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
-                    <div className="text-6xl font-bold text-green-700 mb-4 tracking-wider">
-                      {todayData.answer}
-                    </div>
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Today's Answer Verified
-                      </Badge>
-                      <Badge variant="outline">
-                        Difficulty: {todayData.difficulty}
-                      </Badge>
-                    </div>
-                    <a 
-                      href="/?game=wordle&mode=infinite"
-                      className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg rounded-md font-medium transition-colors no-underline"
-                    >
-                      <Play className="w-5 h-5 mr-2" />
-                      Play Unlimited Practice
-                    </a>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {todayData.strategies.map((strategy, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="bg-red-100 text-red-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
+                            {index + 1}
+                          </span>
+                          <span className="text-gray-700">{strategy}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </CardContent>
                 </Card>
-
-                {/* Hints and Strategies */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Lightbulb className="w-5 h-5 text-yellow-500" />
-                        <h2 className="text-xl font-semibold">Today's Hints</h2>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-3">
-                        {todayData.hints.map((hint, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
-                              {index + 1}
-                            </span>
-                            <span className="text-gray-700">{hint}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-red-500" />
-                        <h2 className="text-xl font-semibold">Winning Strategies</h2>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-3">
-                        {todayData.strategies.map((strategy, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="bg-red-100 text-red-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
-                              {index + 1}
-                            </span>
-                            <span className="text-gray-700">{strategy}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </div>
 
                 {/* Wordle Guide Section */}
                 <Card>

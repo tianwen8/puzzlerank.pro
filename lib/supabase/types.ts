@@ -38,9 +38,61 @@ export interface CombinedPlayerStats {
   email: string;
 }
 
+// Wordle Prediction Types
+export interface WordleHints {
+  firstLetter: string
+  length: number
+  vowels: string[]
+  consonants: string[]
+  wordType: string
+  difficulty: string
+  clues: string[]
+}
+
 export interface Database {
   public: {
     Tables: {
+      wordle_predictions: {
+        Row: {
+          id: number
+          game_number: number
+          date: string
+          predicted_word: string | null
+          verified_word: string | null
+          status: 'candidate' | 'verified' | 'rejected'
+          confidence_score: number
+          verification_sources: string[]
+          hints: WordleHints | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          game_number: number
+          date: string
+          predicted_word?: string | null
+          verified_word?: string | null
+          status?: 'candidate' | 'verified' | 'rejected'
+          confidence_score?: number
+          verification_sources?: string[]
+          hints?: WordleHints | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          game_number?: number
+          date?: string
+          predicted_word?: string | null
+          verified_word?: string | null
+          status?: 'candidate' | 'verified' | 'rejected'
+          confidence_score?: number
+          verification_sources?: string[]
+          hints?: WordleHints | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       game_sessions: {
         Row: {
           id: string
