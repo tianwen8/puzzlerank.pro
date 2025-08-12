@@ -90,11 +90,12 @@ export class NYTOfficialCollectorFixed {
               console.log(`HTTP Error ${res.statusCode}: ${data}`)
               reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`))
             }
-          } catch (error) {
-            console.log(`JSON Parse Error: ${error.message}`)
-            console.log(`Raw data: ${data}`)
-            reject(new Error(`Failed to parse JSON: ${error.message}`))
-          }
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          console.log(`JSON Parse Error: ${errorMessage}`)
+          console.log(`Raw data: ${data}`)
+          reject(new Error(`Failed to parse JSON: ${errorMessage}`))
+        }
         })
         
         stream.on('error', (error) => {
@@ -105,7 +106,7 @@ export class NYTOfficialCollectorFixed {
       
       req.on('error', (error) => {
         console.log(`Request Error: ${error.message}`)
-        console.log(`Error code: ${error.code}`)
+        console.log(`Error code: ${(error as any).code || 'unknown'}`)
         reject(error)
       })
       
@@ -149,9 +150,9 @@ export class NYTOfficialCollectorFixed {
     } catch (error) {
       console.error('❌ NYT API collection failed:', error)
       console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any).code || 'unknown',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
       })
       
       return {

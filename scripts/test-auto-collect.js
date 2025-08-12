@@ -1,10 +1,11 @@
-const fetch = require('node-fetch');
+// 使用 Node.js 内置的 fetch (Node.js 18+)
+// const fetch = require('node-fetch'); // 不再需要
 
 async function testAutoCollect() {
   try {
     console.log('Testing auto-collect API...');
     
-    const response = await fetch('http://localhost:3000/api/wordle/auto-collect', {
+    const response = await fetch('http://localhost:3003/api/wordle/auto-collect', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

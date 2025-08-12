@@ -54,7 +54,7 @@ export class NYTProxyCollector {
         }
         
       } catch (error) {
-        console.log(`❌ Proxy ${proxyUrl} failed:`, error.message)
+        console.log(`❌ Proxy ${proxyUrl} failed:`, error instanceof Error ? error.message : 'Unknown error')
         continue
       }
     }
