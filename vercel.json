@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "1 8 * * *"
+      "schedule": "0 22 * * *"
     }
   ],
   "functions": {
