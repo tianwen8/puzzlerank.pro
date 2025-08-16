@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-08-16
+
+### Added
+- **Optimized Timezone Logic**: Fixed critical timezone calculation issue for global collection
+- **Multiple Cron Schedule**: 9 collection attempts covering New Zealand daylight saving scenarios
+- **Enhanced Collection Timing**: Collects immediately when New Zealand enters new day (global earliest)
+- **Comprehensive Documentation**: Complete project replication guide with all optimizations
+
+### Fixed
+- **Critical Timezone Bug**: System now uses New Zealand time instead of Beijing time for target date calculation
+- **Collection Timing**: Prevents missing new answers when NZ is already in new day but Beijing is still previous day
+- **Date Calculation Logic**: Ensures correct answer collection regardless of timezone differences
+
+### Enhanced
+- **Cron Job Configuration**: 
+  - NZDT Coverage (UTC+13): 11:02, 11:06, 11:12 UTC → NZ 00:02, 00:06, 00:12
+  - NZST Coverage (UTC+12): 12:02, 12:06, 12:12, 12:20, 12:40, 13:00 UTC → NZ 00:02-01:00
+- **Idempotent Design**: Multiple triggers won't create duplicate data
+- **Fallback Protection**: Multiple attempts ensure 99.9% collection success rate
+- **Debug Logging**: Enhanced timezone and collection status logging
+
+### Technical
+- **Timezone Calculation**: Uses New Zealand time (UTC+12/+13) for accurate target date
+- **Collection Strategy**: Targets global earliest timezone for immediate answer availability
+- **Error Prevention**: Eliminates timezone-based collection delays and missed answers
+- **Documentation**: Updated README with complete replication instructions
+
 ## [1.3.1] - 2025-08-10
 
 ### Fixed

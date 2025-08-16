@@ -2,7 +2,39 @@
   "crons": [
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "0 22 * * *"
+      "schedule": "2 11 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "6 11 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "12 11 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "2 12 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "6 12 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "12 12 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "20 12 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "40 12 * * *"
+    },
+    {
+      "path": "/api/wordle/auto-collect",
+      "schedule": "0 13 * * *"
     }
   ],
   "functions": {

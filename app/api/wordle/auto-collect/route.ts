@@ -7,22 +7,23 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🚀 Starting automatic Wordle collection...')
     
-    // Get current Beijing time and calculate target date
-    const beijingTime = new Date(new Date().getTime() + 8 * 60 * 60 * 1000)
+    // Get current times for different timezones
+    const utcTime = new Date()
+    const beijingTime = new Date(utcTime.getTime() + 8 * 60 * 60 * 1000)
     const beijingHour = beijingTime.getHours()
     const beijingMinute = beijingTime.getMinutes()
     
-    // Determine target date based on Beijing time
-    // If it's before 12:00 Beijing time, collect yesterday's answer
-    // If it's after 12:00 Beijing time, collect today's answer
-    let targetDate = new Date(beijingTime)
-    if (beijingHour < 12) {
-      targetDate.setDate(targetDate.getDate() - 1)
-    }
+    // Calculate New Zealand time (NZST=UTC+12 in winter, NZDT=UTC+13 in summer)
+    // August is winter in NZ, so UTC+12
+    const nzTime = new Date(utcTime.getTime() + 12 * 60 * 60 * 1000)
+    
+    // Use New Zealand date as target date since Wordle releases at NZ midnight
+    let targetDate = new Date(nzTime)
     const dateStr = targetDate.toISOString().split('T')[0]
     
     console.log(`⏰ Beijing Time: ${beijingTime.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})} (${beijingHour}:${beijingMinute.toString().padStart(2, '0')})`)
-    console.log(`🎯 Target collection date: ${dateStr}`)
+    console.log(`🇳🇿 New Zealand Time: ${nzTime.toLocaleString('en-NZ', {timeZone: 'Pacific/Auckland'})}`)
+    console.log(`🎯 Target collection date: ${dateStr} (based on NZ date)`)
     
     // Initialize Supabase client first to check existing data
     const supabase = createClient(
