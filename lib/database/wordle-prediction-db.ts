@@ -93,41 +93,63 @@ export class WordlePredictionDB {
     return baseGameNumber + diffDays;
   }
   
-  // 获取今日预测
+  // 获取今日预测 - 返回今天的最新答案
   static async getTodayPrediction(): Promise<WordlePrediction | null> {
-    const today = new Date().toISOString().split('T')[0]
-    const todayGameNumber = this.calculateGameNumber(today)
-    
-    const { data, error } = await getSupabaseClient()
-      .from('wordle_predictions')
-      .select('*')
-      .eq('date', today)
-      .eq('game_number', todayGameNumber)
-      .single()
-    
-    if (error && error.code !== 'PGRST116') {
-      console.error('Failed to get today prediction:', error)
-      return null
-    }
-    
-    return data
-  }
-  
-  // 获取历史预测（已验证）
-  static async getHistoryPredictions(limit = 20): Promise<WordlePrediction[]> {
     const supabase = getSupabaseClient()
     
     if (!supabase) {
-      // 使用 JSON 文件备用
-      return await getFallbackDB().getHistoryPredictions(limit)
+      return await getFallbackDB().getTodayPrediction()
     }
     
     try {
+      // 获取最新的已验证答案（按游戏编号降序）
       const { data, error } = await supabase
         .from('wordle_predictions')
         .select('*')
         .eq('status', 'verified')
-        .order('date', { ascending: false })
+        .order('game_number', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Failed to get today prediction:', error)
+        return await getFallbackDB().getTodayPrediction()
+      }
+      
+      return data
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getTodayPrediction()
+    }
+  }
+  
+  // 获取历史预测（已验证）- 只返回今天之前的答案
+  static async getHistoryPredictions(limit = 20): Promise<WordlePrediction[]> {
+    const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      return await getFallbackDB().getHistoryPredictions(limit)
+    }
+    
+    try {
+      // 获取最新的已验证答案的游戏编号
+      const { data: latestData } = await supabase
+        .from('wordle_predictions')
+        .select('game_number')
+        .eq('status', 'verified')
+        .order('game_number', { ascending: false })
+        .limit(1)
+        .single()
+      
+      const latestGameNumber = latestData?.game_number || 0
+      
+      // 获取历史答案（排除最新的今天答案）
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('*')
+        .eq('status', 'verified')
+        .lt('game_number', latestGameNumber) // 只获取小于最新游戏编号的答案
+        .order('game_number', { ascending: false })
         .limit(limit)
       
       if (error) {

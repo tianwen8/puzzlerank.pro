@@ -41,15 +41,29 @@ class WordlePredictionDBFallback {
 
   async getTodayPrediction(): Promise<WordlePrediction | null> {
     const data = this.readData()
-    const today = new Date().toISOString().split('T')[0]
-    return data.predictions.find(p => p.date === today) || null
+    
+    // 获取最新的已验证答案（按游戏编号降序）
+    const latestPrediction = data.predictions
+      .filter(p => p.status === 'verified')
+      .sort((a, b) => b.game_number - a.game_number)[0]
+    
+    return latestPrediction || null
   }
 
   async getHistoryPredictions(limit: number = 20): Promise<WordlePrediction[]> {
     const data = this.readData()
-    return data.predictions
+    
+    // 获取最新的已验证答案
+    const latestPrediction = data.predictions
       .filter(p => p.status === 'verified')
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort((a, b) => b.game_number - a.game_number)[0]
+    
+    const latestGameNumber = latestPrediction?.game_number || 0
+    
+    // 返回历史答案（排除最新的今天答案）
+    return data.predictions
+      .filter(p => p.status === 'verified' && p.game_number < latestGameNumber)
+      .sort((a, b) => b.game_number - a.game_number)
       .slice(0, limit)
   }
 
