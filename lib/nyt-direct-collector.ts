@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon'
-
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
@@ -26,8 +24,17 @@ export class NYTDirectCollector {
 
   private getCandidateDates(): string[] {
     // Get New Zealand date (earliest timezone) and US Eastern date as fallback
-    const nzDate = DateTime.now().setZone('Pacific/Auckland').toISODate()!
-    const usDate = DateTime.now().setZone('America/New_York').toISODate()!
+    const utcTime = new Date()
+    
+    // New Zealand time (UTC+12 in winter, UTC+13 in summer)
+    // August is winter in NZ, so UTC+12
+    const nzTime = new Date(utcTime.getTime() + 12 * 60 * 60 * 1000)
+    const nzDate = nzTime.toISOString().split('T')[0]
+    
+    // US Eastern time (UTC-5 in winter, UTC-4 in summer)
+    // August is summer in US, so UTC-4
+    const usTime = new Date(utcTime.getTime() - 4 * 60 * 60 * 1000)
+    const usDate = usTime.toISOString().split('T')[0]
     
     // Return unique dates, NZ first (priority)
     return Array.from(new Set([nzDate, usDate]))
