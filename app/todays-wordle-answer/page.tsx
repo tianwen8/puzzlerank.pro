@@ -170,6 +170,30 @@ export default function TodaysWordleAnswerPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Link to dedicated game page */}
+        {todayData && (
+          <div className="mb-6 md:mb-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-blue-900 mb-1">
+                    Wordle #{todayData.gameNumber} Dedicated Page
+                  </h2>
+                  <p className="text-sm text-blue-700">
+                    View the complete solution with enhanced SEO and sharing features
+                  </p>
+                </div>
+                <a 
+                  href={`/wordle/${todayData.gameNumber}`}
+                  className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  View Wordle #{todayData.gameNumber}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="today" className="flex items-center gap-2">
@@ -306,7 +330,7 @@ export default function TodaysWordleAnswerPage() {
               <CardContent>
                 <div className="space-y-4">
                   {historyData.map((entry) => (
-                    <div key={entry.gameNumber} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div key={entry.gameNumber} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors gap-3">
                       <div className="flex items-center gap-4">
                         <div className="text-sm text-gray-500">#{entry.gameNumber}</div>
                         <div className="font-mono text-lg font-bold text-gray-800">{entry.answer}</div>
@@ -314,10 +338,16 @@ export default function TodaysWordleAnswerPage() {
                           {entry.difficulty}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div className="text-sm text-gray-500">
                           {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </div>
+                        <a 
+                          href={`/wordle/${entry.gameNumber}`}
+                          className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md transition-colors no-underline"
+                        >
+                          View Details
+                        </a>
                         <a 
                           href="/?game=wordle&mode=infinite"
                           className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors no-underline"

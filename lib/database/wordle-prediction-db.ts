@@ -288,6 +288,60 @@ export class WordlePredictionDB {
     return data?.value
   }
   
+  // 获取所有游戏数据（用于sitemap生成）
+  static async getAllGames(): Promise<WordlePrediction[]> {
+    const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      return await getFallbackDB().getAllGames()
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('game_number, date, status')
+        .eq('status', 'verified')
+        .order('game_number', { ascending: true })
+      
+      if (error) {
+        console.error('Failed to get all games:', error)
+        return await getFallbackDB().getAllGames()
+      }
+      
+      return data || []
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getAllGames()
+    }
+  }
+
+  // 根据游戏编号获取单个游戏数据
+  static async getGameByNumber(gameNumber: number): Promise<WordlePrediction | null> {
+    const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      return await getFallbackDB().getGameByNumber(gameNumber)
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('*')
+        .eq('game_number', gameNumber)
+        .single()
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Failed to get game by number:', error)
+        return await getFallbackDB().getGameByNumber(gameNumber)
+      }
+      
+      return data
+    } catch (error) {
+      console.error('Supabase error, using fallback:', error)
+      return await getFallbackDB().getGameByNumber(gameNumber)
+    }
+  }
+  
   // 获取统计信息
   static async getStats(): Promise<{
     total: number

@@ -126,6 +126,19 @@ class WordlePredictionDBFallback {
     }
   }
 
+  async getAllGames(): Promise<WordlePrediction[]> {
+    const data = this.readData()
+    return data.predictions
+      .filter(p => p.status === 'verified')
+      .sort((a, b) => a.game_number - b.game_number)
+  }
+
+  async getGameByNumber(gameNumber: number): Promise<WordlePrediction | null> {
+    const data = this.readData()
+    const game = data.predictions.find(p => p.game_number === gameNumber)
+    return game || null
+  }
+
   async getVerificationSources(): Promise<any[]> {
     return [
       { name: 'tomsguide', weight: 1.0, active: true },
