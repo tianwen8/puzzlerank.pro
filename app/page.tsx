@@ -21,6 +21,14 @@ import WordleKeyboard from "@/components/games/wordle/wordle-keyboard"
 import WordleGameControls from "@/components/games/wordle/wordle-game-controls"
 import WordleGameControlsInline from "@/components/games/wordle/wordle-game-controls-inline"
 
+// Function to get current Wordle game number
+function getCurrentWordleGameNumber(): number {
+  const today = new Date()
+  const wordleStartDate = new Date('2021-06-19') // Wordle #1 date
+  const daysSinceStart = Math.floor((today.getTime() - wordleStartDate.getTime()) / (1000 * 60 * 60 * 24))
+  return daysSinceStart + 1
+}
+
 function ErrorNotification() {
   const { error } = useMultiGame()
   const [showError, setShowError] = useState(false)
@@ -55,8 +63,14 @@ function ErrorNotification() {
 function GameContent() {
   const searchParams = useSearchParams()
   const [authError, setAuthError] = useState<string | null>(null)
+  const [currentGameNumber, setCurrentGameNumber] = useState<number>(0)
   const { currentGame } = useMultiGame()
   const isMobile = useIsMobile()
+
+  // Get current Wordle game number on component mount
+  useEffect(() => {
+    setCurrentGameNumber(getCurrentWordleGameNumber())
+  }, [])
 
   useEffect(() => {
     const error = searchParams.get("error")
@@ -103,7 +117,12 @@ function GameContent() {
                       <a href="/todays-wordle-answer" className="inline-block">
                         <div className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-lg transition-all duration-200 flex items-center gap-2">
                           <span className="text-lg">💡</span>
-                          <span>Today's Wordle Answer</span>
+                          <div className="flex flex-col">
+                            <span>Today's Wordle Answer</span>
+                            {currentGameNumber > 0 && (
+                              <span className="text-xs opacity-90">Wordle #{currentGameNumber}</span>
+                            )}
+                          </div>
                         </div>
                       </a>
                     </div>
@@ -147,16 +166,45 @@ function GameContent() {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Today's <span className="text-yellow-300">Wordle Answer</span> & Daily Hints
           </h1>
+          {currentGameNumber > 0 && (
+            <div className="mb-6">
+              <div className="inline-flex items-center bg-gradient-to-r from-blue-500/30 to-purple-500/30 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20">
+                <span className="text-2xl mr-3">🎯</span>
+                <div className="text-left">
+                  <div className="text-lg font-semibold text-white">Wordle #{currentGameNumber}</div>
+                  <div className="text-sm text-white/80">Updated daily at 00:30</div>
+                </div>
+              </div>
+            </div>
+          )}
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto">
             Get <strong>today's Wordle answer</strong> with verified daily hints! Play <strong>unlimited word practice games</strong> and compete on global leaderboards. 
             Fresh solutions updated every day with smart tips and strategies!
           </p>
-          <div className="flex flex-wrap justify-center gap-4 text-white/80">
+          <div className="flex flex-wrap justify-center gap-4 text-white/80 mb-6">
             <span className="bg-white/20 px-4 py-2 rounded-full">💡 Daily Wordle Answers</span>
             <span className="bg-white/20 px-4 py-2 rounded-full">🏆 Global Rankings</span>
             <span className="bg-white/20 px-4 py-2 rounded-full">🎮 Unlimited Practice</span>
             <span className="bg-white/20 px-4 py-2 rounded-full">🆓 100% Free</span>
           </div>
+          {currentGameNumber > 0 && (
+            <div className="flex flex-wrap justify-center gap-4">
+              <a 
+                href="/todays-wordle-answer"
+                className="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
+              >
+                <span className="text-lg mr-2">💡</span>
+                Get Today's Answer
+              </a>
+              <a 
+                href={`/wordle/${currentGameNumber}`}
+                className="inline-flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
+              >
+                <span className="text-lg mr-2">🎯</span>
+                View Wordle #{currentGameNumber}
+              </a>
+            </div>
+          )}
         </div>
         )}
 

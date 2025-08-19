@@ -127,7 +127,100 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
 
   const gameData = await getWordleGameData(gameNumber)
   
+  // If game not found, check if it's a future game
   if (!gameData) {
+    const today = new Date()
+    const wordleStartDate = new Date('2021-06-19') // Wordle #1 date
+    const daysSinceStart = Math.floor((today.getTime() - wordleStartDate.getTime()) / (1000 * 60 * 60 * 24))
+    const currentGameNumber = daysSinceStart + 1
+    
+    // If it's a future game number, show coming soon page
+    if (gameNumber > currentGameNumber) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 md:py-16">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">
+                Wordle #{gameNumber} Coming Soon
+              </h1>
+              <p className="text-lg md:text-xl lg:text-2xl mb-4 md:mb-8 opacity-90">
+                This game hasn't been released yet
+              </p>
+              <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 md:px-6 py-2 md:py-3">
+                <Clock className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                <span className="font-semibold text-sm md:text-base">Available at 00:30 daily</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="container mx-auto px-4 py-6 md:py-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <Card>
+                <CardContent className="p-6 md:p-8">
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Clock className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4">
+                      Next Wordle Update at 00:30
+                    </h2>
+                    <p className="text-gray-600 mb-6">
+                      Wordle #{gameNumber} will be available soon. New Wordle answers are released daily at 00:30. Please check back later!
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <a 
+                      href="/todays-wordle-answer"
+                      className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors text-base font-medium"
+                    >
+                      <Target className="w-5 h-5 mr-2" />
+                      Play Today's Wordle
+                    </a>
+                    
+                    <div className="text-sm text-gray-500">
+                      <p>Current game: Wordle #{currentGameNumber}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <BookOpen className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                    <h3 className="font-semibold text-gray-800 mb-2">Browse History</h3>
+                    <p className="text-sm text-gray-600 mb-3">Check out previous Wordle answers and solutions</p>
+                    <a 
+                      href="/wordle/history"
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      View All Games →
+                    </a>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <Lightbulb className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                    <h3 className="font-semibold text-gray-800 mb-2">Practice Mode</h3>
+                    <p className="text-sm text-gray-600 mb-3">Play unlimited Wordle games to improve your skills</p>
+                    <a 
+                      href="/?game=wordle&mode=infinite"
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      Start Practice →
+                    </a>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    
+    // If it's not a future game, show 404
     notFound()
   }
 
@@ -155,7 +248,7 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
           </p>
           <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 md:px-6 py-2 md:py-3">
             <Clock className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-            <span className="font-semibold text-sm md:text-base">Game #{gameNumber}</span>
+            <span className="font-semibold text-sm md:text-base">Wordle #{gameNumber}</span>
           </div>
         </div>
       </div>
@@ -185,7 +278,7 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
                   href={`/wordle/${gameNumber - 1}`}
                   className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm md:text-base"
                 >
-                  ← Game #{gameNumber - 1}
+                  ← Wordle #{gameNumber - 1}
                 </a>
               )}
             </div>
@@ -202,7 +295,7 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
                 href={`/wordle/${gameNumber + 1}`}
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm md:text-base"
               >
-                Game #{gameNumber + 1} →
+                Wordle #{gameNumber + 1} →
               </a>
             </div>
           </div>
