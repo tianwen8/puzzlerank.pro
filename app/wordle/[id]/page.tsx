@@ -41,9 +41,21 @@ async function getWordleGameData(gameNumber: number) {
       }
     }
 
-    let hints = gameData.hints
-    if (!hints || !hints.clues || !Array.isArray(hints.clues) || hints.clues.length === 0) {
+    // Ensure hints has all required properties
+    let hints: WordleHints
+    if (!gameData.hints || !gameData.hints.clues || !Array.isArray(gameData.hints.clues) || gameData.hints.clues.length === 0) {
       hints = generateDefaultHints(answer)
+    } else {
+      // Merge existing hints with required properties
+      hints = {
+        firstLetter: gameData.hints.firstLetter || answer[0] || 'U',
+        length: gameData.hints.length || answer.length,
+        vowels: gameData.hints.vowels || [...new Set(answer.split('').filter(char => 'AEIOU'.includes(char)))],
+        consonants: gameData.hints.consonants || [...new Set(answer.split('').filter(char => /[A-Z]/.test(char) && !'AEIOU'.includes(char)))],
+        wordType: gameData.hints.wordType || 'common word',
+        difficulty: gameData.hints.difficulty || 'Medium',
+        clues: gameData.hints.clues || []
+      }
     }
 
     return {
