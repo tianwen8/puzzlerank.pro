@@ -147,8 +147,8 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
     const daysSinceStart = Math.floor((today.getTime() - wordleStartDate.getTime()) / (1000 * 60 * 60 * 24))
     const currentGameNumber = daysSinceStart + 1
     
-    // If it's a future game number, show coming soon page
-    if (gameNumber > currentGameNumber) {
+    // If it's a future game number (like tomorrow's #1523), show preview page
+    if (gameNumber >= currentGameNumber) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 md:py-16">
@@ -161,7 +161,7 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
               </p>
               <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 md:px-6 py-2 md:py-3">
                 <Clock className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                <span className="font-semibold text-sm md:text-base">Available at 00:30 daily</span>
+                <span className="font-semibold text-sm md:text-base">Available at 00:05 daily</span>
               </div>
             </div>
           </div>
@@ -175,10 +175,10 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
                       <Clock className="w-8 h-8 text-blue-600" />
                     </div>
                     <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4">
-                      Next Wordle Update at 00:30
+                      Calculating Answer Hints...
                     </h2>
                     <p className="text-gray-600 mb-6">
-                      Wordle #{gameNumber} will be available soon. New Wordle answers are released daily at 00:30. Please check back later!
+                      Wordle #{gameNumber} will be available at 00:05 daily. We're calculating the best answer hints, please check back later!
                     </p>
                   </div>
                   
