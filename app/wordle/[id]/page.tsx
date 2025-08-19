@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Clock, Lightbulb, Target, BookOpen, TrendingUp, Users } from 'lucide-react'
 import WordleHintsStructuredData from '@/components/wordle-hints-structured-data'
 import WordleAnswerHints from '@/components/wordle-answer-hints'
+import SocialShare from '@/components/social-share'
 import { WordleHints } from '@/lib/supabase/types'
 import { WordlePredictionDB } from '@/lib/database/wordle-prediction-db'
 
@@ -325,6 +326,17 @@ export default async function WordleGamePage({ params }: WordleGamePageProps) {
             status={gameData.status}
             confidence={gameData.confidence}
           />
+
+          {/* Social Share */}
+          <div className="flex justify-center">
+            <SocialShare
+              title={`Wordle #${gameNumber} Answer - ${formattedDate}`}
+              description={`I solved Wordle #${gameNumber}! The answer was "${gameData.answer}". Can you solve it too?`}
+              hashtags={['Wordle', `Wordle${gameNumber}`, 'WordleAnswer', 'PuzzleGames']}
+              variant="inline"
+              className="bg-white rounded-lg p-4 shadow-sm"
+            />
+          </div>
 
           {/* Strategies Section */}
           <Card>

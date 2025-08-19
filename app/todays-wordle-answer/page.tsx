@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CheckCircle, Clock, Lightbulb, History, Play, TrendingUp, Users, Target, BookOpen } from 'lucide-react'
 import WordleHintsStructuredData from '@/components/wordle-hints-structured-data'
 import WordleAnswerHints from '@/components/wordle-answer-hints'
+import SocialShare from '@/components/social-share'
 import { WordleHints } from '@/lib/supabase/types'
 
 interface WordleData {
@@ -218,6 +219,17 @@ export default function TodaysWordleAnswerPage() {
                   status={todayData.status}
                   confidence={todayData.confidence}
                 />
+
+                {/* Social Share */}
+                <div className="flex justify-center">
+                  <SocialShare
+                    title={`Today's Wordle Answer #${todayData.gameNumber} - ${todayData.answer}`}
+                    description={`I solved today's Wordle! The answer was "${todayData.answer}". Can you solve it too? Get daily hints and unlimited practice!`}
+                    hashtags={['Wordle', `Wordle${todayData.gameNumber}`, 'WordleAnswer', 'TodaysWordle', 'PuzzleGames']}
+                    variant="inline"
+                    className="bg-white rounded-lg p-4 shadow-sm"
+                  />
+                </div>
 
                 {/* Strategies Section */}
                 <Card>
