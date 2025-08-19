@@ -43,18 +43,19 @@ async function getWordleGameData(gameNumber: number) {
 
     // Ensure hints has all required properties
     let hints: WordleHints
-    if (!gameData.hints || !gameData.hints.clues || !Array.isArray(gameData.hints.clues) || gameData.hints.clues.length === 0) {
+    if (!gameData.hints) {
       hints = generateDefaultHints(answer)
     } else {
-      // Merge existing hints with required properties
+      // Convert database hints format to WordleHints format
+      const dbHints = gameData.hints as any
       hints = {
-        firstLetter: gameData.hints.firstLetter || answer[0] || 'U',
-        length: gameData.hints.length || answer.length,
-        vowels: gameData.hints.vowels || [...new Set(answer.split('').filter(char => 'AEIOU'.includes(char)))],
-        consonants: gameData.hints.consonants || [...new Set(answer.split('').filter(char => /[A-Z]/.test(char) && !'AEIOU'.includes(char)))],
-        wordType: gameData.hints.wordType || 'common word',
-        difficulty: gameData.hints.difficulty || 'Medium',
-        clues: gameData.hints.clues || []
+        firstLetter: answer[0] || 'U',
+        length: answer.length,
+        vowels: [...new Set(answer.split('').filter(char => 'AEIOU'.includes(char)))],
+        consonants: [...new Set(answer.split('').filter(char => /[A-Z]/.test(char) && !'AEIOU'.includes(char)))],
+        wordType: 'common word',
+        difficulty: dbHints.difficulty || 'Medium',
+        clues: dbHints.clues || dbHints.letterHints || []
       }
     }
 
