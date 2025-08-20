@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "2 12 * * *"
+      "schedule": "1 0 * * *"
     },
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "0 13 * * *"
+      "schedule": "1 4 * * *"
     }
   ],
   "functions": {
