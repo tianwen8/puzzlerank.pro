@@ -59,7 +59,7 @@ export default function SocialShare({
 
   // 原生分享API（移动端）
   const nativeShare = async () => {
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
         await navigator.share({
           title,
@@ -166,7 +166,7 @@ export default function SocialShare({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         {/* 原生分享（移动端） */}
-        {typeof navigator !== 'undefined' && navigator.share && (
+        {typeof navigator !== 'undefined' && 'share' in navigator && (
           <DropdownMenuItem onClick={nativeShare}>
             <Share2 className="w-4 h-4 mr-2" />
             Share...
