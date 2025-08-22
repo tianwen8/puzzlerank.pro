@@ -1,8 +1,8 @@
 // Wordle自动更新机制
 // 每日最快最新的数据获取和验证系统
 
-import { getWordleDB, WordleRecord } from './database/wordle-db';
-import { generateHintsForWord } from './wordle-api';
+import { WordlePredictionDB } from './database/wordle-prediction-db';
+import { NYTOfficialCollector } from './nyt-official-collector';
 
 export interface UpdateResult {
   success: boolean;
@@ -280,8 +280,110 @@ export async function scheduleUpdate(): Promise<void> {
   }
 }
 
-// 手动触发更新（用于测试）
-export async function manualUpdate(): Promise<UpdateResult> {
+// 手动触发更新（用于测试和补采历史数据）
+export async function manualUpdate(gameNumber?: number): Promise<UpdateResult> {
   console.log('🔧 手动触发更新...');
+  
+  if (gameNumber) {
+    // 补采指定游戏编号的数据
+    return await updateSpecificAnswer(gameNumber);
+  }
+  
   return await updateTodayAnswer();
+}
+
+// 补采指定游戏编号的答案
+async function updateSpecificAnswer(gameNumber: number): Promise<UpdateResult> {
+  console.log(`🎯 补采游戏编号 #${gameNumber} 的答案...`);
+  
+  try {
+    // 计算对应的日期
+    const baseDate = new Date('2025-08-07');
+    const baseGameNumber = 1510;
+    const diffDays = gameNumber - baseGameNumber;
+    const targetDate = new Date(baseDate);
+    targetDate.setDate(baseDate.getDate() + diffDays);
+    const dateStr = targetDate.toISOString().split('T')[0];
+    
+    console.log(`📅 游戏编号 #${gameNumber} 对应日期: ${dateStr}`);
+    
+    // 使用NYT官方API获取答案
+    const nytCollector = new NYTOfficialCollector();
+    const result = await nytCollector.collectTodayAnswer(dateStr);
+    
+    if (result.success && result.data) {
+      console.log(`✅ NYT官方API成功获取: ${result.data.answer}`);
+      
+      // 保存到数据库
+      const prediction = {
+        game_number: gameNumber,
+        date: dateStr,
+        predicted_word: result.data.answer,
+        verified_word: result.data.answer,
+        status: 'verified' as const,
+        confidence_score: 1.0,
+        verification_sources: ['NYT Official API'],
+        hints: {
+          category: 'daily',
+          difficulty: 'confirmed',
+          clues: [`Today's Wordle answer is ${result.data.answer}`],
+          letterHints: generateLetterHints(result.data.answer)
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      const saved = await WordlePredictionDB.upsertPrediction(prediction);
+      
+      if (saved) {
+        console.log(`💾 数据库更新成功: #${gameNumber} = ${result.data.answer}`);
+        return {
+          success: true,
+          gameNumber: gameNumber,
+          word: result.data.answer,
+          verified: true,
+          sources: ['NYT Official API'],
+          message: `成功补采 #${gameNumber} 的答案: ${result.data.answer}`
+        };
+      } else {
+        throw new Error('数据库保存失败');
+      }
+      
+    } else {
+      throw new Error(result.error || 'NYT API获取失败');
+    }
+    
+  } catch (error) {
+    console.error(`❌ 补采 #${gameNumber} 失败:`, error);
+    return {
+      success: false,
+      gameNumber: gameNumber,
+      word: '',
+      verified: false,
+      sources: [],
+      message: `补采失败: ${error instanceof Error ? error.message : '未知错误'}`
+    };
+  }
+}
+
+// 生成字母提示
+function generateLetterHints(word: string): string[] {
+  if (!word || word.length !== 5) return [];
+  
+  const hints = [];
+  const letters = word.split('');
+  
+  // 第一个字母提示
+  hints.push(`Starts with "${letters[0]}"`);
+  
+  // 包含的字母
+  const uniqueLetters = [...new Set(letters)].sort();
+  if (uniqueLetters.length < 5) {
+    hints.push(`Contains letters: ${uniqueLetters.join(', ')}`);
+  }
+  
+  // 结尾字母提示
+  hints.push(`Ends with "${letters[4]}"`);
+  
+  return hints;
 }
