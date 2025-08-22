@@ -220,13 +220,13 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
     const gameNumber = bestInfo.gameNumber || diffDays;
     
     // 4. 保存到数据库
-    const status = isVerified ? 'verified' : 'predicted';
+    const status = isVerified ? 'verified' : 'candidate';
     const prediction = {
       game_number: gameNumber,
       date: today,
       predicted_word: bestWord,
       verified_word: isVerified ? bestWord : undefined,
-      status: status as 'verified' | 'predicted',
+      status: status as 'candidate' | 'verified' | 'rejected',
       confidence_score: confidenceScore,
       verification_sources: bestInfo.sources,
       hints: {
