@@ -1,941 +1,453 @@
-# PuzzleRank.pro - Wordle Daily Hints & Puzzle Games Platform
+# PuzzleRank Pro - 智能拼图游戏平台
 
-🎮 **Today's Wordle Answer & Daily Hints** - The ultimate puzzle gaming platform featuring Wordle daily answers, unlimited practice games, and global rankings.
+一个集成了2048和Wordle游戏的现代化Web应用，具备自动化数据采集、实时排行榜和智能提示系统。
 
-**Version**: 2.0.0 | **Last Updated**: August 12, 2025
+## 🚀 项目特性
 
-## 🌟 Features
+### 核心功能
+- **多游戏支持**: 2048滑块游戏 + Wordle猜词游戏
+- **实时排行榜**: 基于Supabase的全球玩家排名系统
+- **智能提示系统**: AI驱动的Wordle每日提示和策略建议
+- **自动化数据采集**: 每日自动获取和验证Wordle答案
+- **SEO优化**: 完整的搜索引擎优化和结构化数据
+- **响应式设计**: 支持桌面端和移动端完美体验
 
-- **📅 Daily Wordle Answers**: Get today's verified Wordle answer with hints and strategies
-- **🤖 Automated Collection**: Fully automated NYT official API data collection via Vercel Cron Jobs
-- **🎯 Unlimited Practice**: Play unlimited Wordle and 2048 games with no restrictions
-- **🏆 Global Rankings**: Compete with players worldwide on real-time leaderboards
-- **💡 Smart Hints System**: AI-powered daily hints and solving strategies (no direct answers)
-- **📱 Mobile Optimized**: Perfect responsive design for all devices
-- **🔄 Real-time Updates**: Fresh content updated every day automatically
-- **♿ Accessibility**: Improved heading structure and screen reader compatibility
-- **🔍 SEO Optimized**: Enhanced semantic HTML structure for better search visibility
-- **🌐 International**: Pure English interface for global users
+### 技术亮点
+- **Next.js 14**: 使用App Router和最新特性
+- **TypeScript**: 完整的类型安全保障
+- **Supabase**: 实时数据库和用户认证
+- **Tailwind CSS**: 现代化UI设计系统
+- **Vercel部署**: 自动化CI/CD和边缘计算
+- **自动化Cron**: 定时任务和数据同步
 
-## 🚀 Quick Start
+## 📋 技术栈
 
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Supabase account (for database and authentication)
-- Vercel account (for deployment and cron jobs)
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/puzzlerank.pro.git
-cd puzzlerank.pro
+### 前端技术
+```json
+{
+  "framework": "Next.js 14.2.16",
+  "language": "TypeScript 5.x",
+  "styling": "Tailwind CSS 3.x",
+  "ui_components": "Radix UI + shadcn/ui",
+  "state_management": "React Context + Hooks",
+  "animations": "Framer Motion",
+  "icons": "Lucide React"
+}
 ```
 
-2. **Install dependencies**
-```bash
-npm install
-# Key dependencies added for optimization:
-# - undici: Modern HTTP client for better network requests
-# - @supabase/supabase-js: Database integration
+### 后端技术
+```json
+{
+  "database": "Supabase (PostgreSQL)",
+  "authentication": "Supabase Auth",
+  "api": "Next.js API Routes",
+  "cron_jobs": "Vercel Cron",
+  "data_collection": "NYT Official API + HTML解析",
+  "storage": "Supabase Storage"
+}
 ```
 
-3. **Environment Setup**
-Create a `.env.local` file in the root directory:
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+### 部署和运维
+```json
+{
+  "hosting": "Vercel",
+  "domain": "puzzlerank.pro",
+  "ssl": "自动HTTPS",
+  "cdn": "Vercel Edge Network",
+  "monitoring": "Vercel Analytics",
+  "error_tracking": "内置错误处理"
+}
+```
+
+## 🛠️ 环境配置
+
+### 必需环境变量
+```bash
+# Supabase配置
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# Site Configuration
-NEXT_PUBLIC_SITE_URL=https://puzzlerank.pro
-NEXT_PUBLIC_APP_ENV=production
+# Cron任务安全密钥
+CRON_SECRET=your_cron_secret_key
 
-# Analytics (Optional)
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+# 可选：外部API密钥
+OPENAI_API_KEY=your_openai_key (用于AI提示生成)
 ```
 
-4. **Database Setup**
-The database schema includes optimized tables for automated collection:
+### Supabase数据库表结构
+
+#### 1. wordle_predictions表
 ```sql
--- Wordle predictions table with automated collection support
 CREATE TABLE wordle_predictions (
   id SERIAL PRIMARY KEY,
   game_number INTEGER UNIQUE NOT NULL,
   date DATE NOT NULL,
-  predicted_word TEXT,
-  verified_word TEXT NOT NULL,
-  status TEXT DEFAULT 'verified',
-  confidence_score DECIMAL DEFAULT 1.0,
-  verification_sources TEXT[],
-  hints JSONB, -- Structured hints instead of direct answers
+  predicted_word VARCHAR(5),
+  verified_word VARCHAR(5),
+  status VARCHAR(20) CHECK (status IN ('candidate', 'verified', 'rejected')),
+  confidence_score DECIMAL(3,2) DEFAULT 0.0,
+  verification_sources TEXT[] DEFAULT '{}',
+  hints JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 
-5. **Run the development server**
-```bash
-npm run dev
+#### 2. game_sessions表
+```sql
+CREATE TABLE game_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  score INTEGER NOT NULL,
+  moves_count INTEGER NOT NULL,
+  duration_seconds INTEGER NOT NULL,
+  is_won BOOLEAN NOT NULL,
+  highest_tile INTEGER NOT NULL,
+  game_board JSONB,
+  game_type VARCHAR(20) DEFAULT '2048',
+  game_data JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the application.
+#### 3. player_stats表
+```sql
+CREATE TABLE player_stats (
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id),
+  username VARCHAR(50),
+  email VARCHAR(255),
+  avatar_url TEXT,
+  best_score INTEGER DEFAULT 0,
+  total_games INTEGER DEFAULT 0,
+  games_won INTEGER DEFAULT 0,
+  current_streak INTEGER DEFAULT 0,
+  best_streak INTEGER DEFAULT 0,
+  total_moves INTEGER DEFAULT 0,
+  total_duration_seconds INTEGER DEFAULT 0,
+  highest_tile_achieved INTEGER DEFAULT 0,
+  wordle_games_played INTEGER DEFAULT 0,
+  wordle_games_won INTEGER DEFAULT 0,
+  wordle_current_streak INTEGER DEFAULT 0,
+  wordle_best_streak INTEGER DEFAULT 0,
+  wordle_average_guesses DECIMAL(3,2) DEFAULT 0.0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
 
-## 🔧 Complete System Optimization & Solutions
+## 🔧 安装和运行
 
-### 🎯 Core Problem Solved: Automated NYT Official API Collection
+### 1. 克隆项目
+```bash
+git clone https://github.com/tianwen8/puzzlerank.pro.git
+cd puzzlerank.pro
+```
 
-**Challenge**: Create a fully automated system that collects official Wordle answers from NYT API and stores them in database without manual intervention.
+### 2. 安装依赖
+```bash
+# 使用pnpm (推荐)
+pnpm install
 
-**Solution**: Comprehensive automation system with network bypass and intelligent hint generation.
+# 或使用npm
+npm install
 
----
+# 或使用yarn
+yarn install
+```
 
-### 1. 🤖 Automated Collection System Architecture
+### 3. 环境配置
+```bash
+# 复制环境变量模板
+cp .env.example .env.local
 
-#### A. Optimized Vercel Cron Jobs Setup (`vercel.json`)
+# 编辑环境变量
+nano .env.local
+```
+
+### 4. 数据库初始化
+```bash
+# 在Supabase控制台执行SQL脚本
+# 或使用提供的初始化脚本
+node scripts/init-database.js
+```
+
+### 5. 启动开发服务器
+```bash
+pnpm dev
+# 访问 http://localhost:3000
+```
+
+## 📦 项目结构
+
+```
+puzzlerank.pro/
+├── app/                          # Next.js App Router
+│   ├── api/                      # API路由
+│   │   ├── wordle/              # Wordle相关API
+│   │   │   ├── route.ts         # 基础Wordle API
+│   │   │   ├── auto/route.ts    # 自动采集API
+│   │   │   └── update/route.ts  # 数据更新API
+│   │   └── seo/                 # SEO相关API
+│   ├── admin/                   # 管理员页面
+│   │   ├── collection/          # 数据采集管理
+│   │   ├── seo/                 # SEO管理
+│   │   └── wordle-automation/   # Wordle自动化管理
+│   ├── wordle/                  # Wordle游戏页面
+│   │   ├── [id]/               # 动态游戏页面
+│   │   ├── today/              # 今日游戏
+│   │   └── history/            # 历史记录
+│   └── daily-hints/            # 每日提示页面
+├── components/                  # React组件
+│   ├── ui/                     # 基础UI组件
+│   ├── games/                  # 游戏组件
+│   └── shared/                 # 共享组件
+├── lib/                        # 核心库文件
+│   ├── database/               # 数据库操作
+│   │   ├── wordle-prediction-db.ts      # Supabase数据库操作
+│   │   ├── wordle-prediction-db-fallback.ts # JSON备用数据库
+│   │   └── wordle-data.json    # 备用数据文件
+│   ├── supabase/              # Supabase配置
+│   │   ├── client.ts          # 客户端配置
+│   │   └── types.ts           # 类型定义
+│   ├── seo/                   # SEO优化
+│   ├── nyt-official-collector.ts        # NYT官方API采集器
+│   ├── wordle-collector.ts              # 多源数据采集器
+│   ├── wordle-updater.ts                # 数据更新系统
+│   ├── wordle-scheduler.ts              # 定时任务调度
+│   └── answer-hint-generator.ts         # AI提示生成器
+├── scripts/                    # 工具脚本
+│   ├── init-database.js       # 数据库初始化
+│   ├── test-collection.js     # 采集测试
+│   └── deployment-check.js    # 部署检查
+├── public/                     # 静态资源
+├── styles/                     # 样式文件
+└── vercel.json                # Vercel配置
+```
+
+## 🤖 自动化系统
+
+### Wordle数据采集系统
+
+#### 1. 数据源配置
+```typescript
+// 主要数据源：NYT官方API (最高优先级)
+const NYT_API_URL = 'https://www.nytimes.com/svc/wordle/v2/{gameNumber}.json'
+
+// 备用数据源：HTML解析
+const BACKUP_SOURCES = [
+  'https://www.tomsguide.com/news/what-is-todays-wordle-answer',
+  'https://www.wordtips.com/wordle-today/',
+  // 更多备用源...
+]
+```
+
+#### 2. 游戏编号计算
+```typescript
+// 基准日期：2025-08-07 = 游戏编号 #1510
+function calculateGameNumber(date: string): number {
+  const baseDate = new Date('2025-08-07');
+  const baseGameNumber = 1510;
+  const targetDate = new Date(date);
+  const diffDays = Math.floor((targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+  return baseGameNumber + diffDays;
+}
+```
+
+#### 3. Vercel Cron配置
 ```json
 {
   "crons": [
     {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "2 11 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "6 11 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "12 11 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
+      "path": "/api/wordle/auto",
       "schedule": "2 12 * * *"
     },
     {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "6 12 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "12 12 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "20 12 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
-      "schedule": "40 12 * * *"
-    },
-    {
-      "path": "/api/wordle/auto-collect",
+      "path": "/api/wordle/auto",
       "schedule": "0 13 * * *"
     }
-  ],
-  "functions": {
-    "app/api/wordle/auto-collect/route.ts": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }
 ```
 
-**Optimized Configuration Details**:
-- **Multiple Schedules**: 9 collection attempts covering both NZ daylight saving scenarios
-- **NZDT Coverage (UTC+13)**: 11:02, 11:06, 11:12 UTC → NZ 00:02, 00:06, 00:12
-- **NZST Coverage (UTC+12)**: 12:02, 12:06, 12:12, 12:20, 12:40, 13:00 UTC → NZ 00:02-01:00
-- **Timing Strategy**: Collects immediately when New Zealand enters new day (global earliest)
-- **Fallback Protection**: Multiple attempts ensure 99.9% collection success rate
-- **Idempotent Design**: Multiple triggers won't create duplicate data
+### 数据验证流程
 
-#### B. Network Access Solution - Critical Breakthrough
-
-**Problem Identified**:
-```bash
-❌ Direct NYT API access: Connect Timeout Error (www.nytimes.com:443)
-❌ Using undici library: UND_ERR_CONNECT_TIMEOUT
-❌ Using https module: socket hang up
-❌ All direct methods: Network restrictions blocking access
-```
-
-**Solution Implemented**: Proxy Service Bypass
+#### 1. 多源验证
 ```typescript
-// lib/nyt-proxy-collector.ts
-export class NYTProxyCollector {
-  private async fetchViaProxy(url: string): Promise<any> {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-    const response = await fetch(proxyUrl)
-    const proxyResponse = JSON.parse(await response.text())
-    return JSON.parse(proxyResponse.contents)
-  }
+interface UpdateResult {
+  success: boolean;
+  gameNumber: number;
+  word: string;
+  verified: boolean;
+  sources: string[];
+  message: string;
 }
 ```
 
-**Test Results Verification**:
-```bash
-# Testing proxy access to NYT API
-✅ SUCCESS with AllOrigins!
-   ID: 1429
-   Solution: nomad
-   Print Date: 2025-08-12
-   Days Since Launch: 1515
-   Editor: Tracy Bennett
-
-🎉 Proxy test SUCCESSFUL!
-Success Rate: 100%
-Response Time: ~1 second
+#### 2. 置信度评分
+```typescript
+// 置信度计算规则
+const confidenceScore = Math.min(1.0, (sourceWeight * 0.05 + sourceCount * 0.1));
+const isVerified = sourceCount >= 2 || sourceWeight >= 15;
 ```
 
-#### C. Automated Collection API (`app/api/wordle/auto-collect/route.ts`)
+## 🔐 安全配置
+
+### API安全
 ```typescript
-export async function GET(request: NextRequest) {
-  try {
-    // 1. Calculate Beijing time for accurate date
-    const beijingTime = new Date(new Date().getTime() + 8 * 60 * 60 * 1000)
-    const dateStr = beijingTime.toISOString().split('T')[0]
-    
-    console.log(`⏰ Beijing Time: ${beijingTime.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})} (${beijingHour}:${beijingMinute.toString().padStart(2, '0')})`)
-    console.log(`🇳🇿 New Zealand Time: ${nzTime.toLocaleString('en-NZ', {timeZone: 'Pacific/Auckland'})}`)
-    console.log(`🎯 Target collection date: ${dateStr} (based on NZ date)`)
-    
-    // 2. Check if we already have verified data for this game
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    
-    // Calculate expected game number based on target date
-    const launchDate = new Date('2021-06-19') // Wordle launch date
-    const timeDiff = targetDate.getTime() - launchDate.getTime()
-    const expectedGameNumber = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1
-    
-    // Check if we already have verified data for this game
-    const { data: existingGame } = await supabase
-      .from('wordle_predictions')
-      .select('*')
-      .eq('game_number', expectedGameNumber)
-      .eq('status', 'verified')
-      .single()
-    
-    if (existingGame && existingGame.verified_word) {
-      console.log(`✅ Game #${expectedGameNumber} already verified with answer: ${existingGame.verified_word}`)
-      return NextResponse.json({
-        success: true,
-        data: {
-          gameNumber: expectedGameNumber,
-          answer: existingGame.verified_word,
-          date: dateStr,
-          hints: existingGame.hints,
-          action: 'already_verified',
-          source: 'Database Cache'
-        },
-        message: `Game #${expectedGameNumber} already verified - skipping collection`
-      })
-    }
-    
-    // 3. Collect from NYT Official API via proxy
-    const nytCollector = new NYTProxyCollector()
-    const collectionResult = await nytCollector.collectTodayAnswer(dateStr)
-    
-    if (!collectionResult.success) {
-      console.log(`❌ Collection failed: ${collectionResult.error}`)
-      return NextResponse.json({
-        success: false,
-        error: 'Failed to collect from NYT Official API',
-        details: collectionResult.error
-      }, { status: 500 })
-    }
-    
-    console.log('✅ Successfully collected from NYT Official API:', collectionResult.data)
-    
-    // 4. Generate structured hints (no direct answers)
-    const { gameNumber, answer, date } = collectionResult.data!
-    const hints = hintGenerator.generateHints(answer)
-    
-    // 4. Save to database with upsert logic
-    const { data: existingGame } = await supabase
-      .from('wordle_predictions')
-      .select('*')
-      .eq('game_number', gameNumber)
-      .single()
-    
-    if (existingGame) {
-      // Update existing record
-      await supabase
-        .from('wordle_predictions')
-        .update({
-          verified_word: answer,
-          hints: hints,
-          verification_sources: ['NYT Official API'],
-          updated_at: new Date().toISOString()
-        })
-        .eq('game_number', gameNumber)
-    } else {
-      // Insert new record
-      await supabase
-        .from('wordle_predictions')
-        .insert({
-          game_number: gameNumber,
-          date: date,
-          verified_word: answer,
-          hints: hints,
-          verification_sources: ['NYT Official API'],
-          status: 'verified',
-          confidence_score: 1.0
-        })
-    }
-    
-    return NextResponse.json({
-      success: true,
-      data: { gameNumber, answer, date, hints, source: 'NYT Official API' },
-      message: `Successfully collected and stored Wordle #${gameNumber} from NYT Official API`
-    })
-    
-  } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    }, { status: 500 })
-  }
+// Cron任务认证
+const CRON_SECRET = process.env.CRON_SECRET;
+if (request.headers.get('Authorization') !== `Bearer ${CRON_SECRET}`) {
+  return new Response('Unauthorized', { status: 401 });
 }
 ```
 
----
-
-### 2. 🎯 Intelligent Hint System (Game-Preserving)
-
-**Problem**: Direct answers ruin the game experience for users
-**Solution**: Structured hint generation that maintains challenge
-
-#### Hint Generation Engine (`lib/answer-hint-generator.ts`)
-```typescript
-export class AnswerHintGenerator {
-  generateHints(answer: string) {
-    const upperAnswer = answer.toUpperCase()
-    const vowels = upperAnswer.match(/[AEIOU]/g) || []
-    const consonants = upperAnswer.replace(/[AEIOU]/g, '').split('')
-    
-    return {
-      firstLetter: upperAnswer[0],
-      length: upperAnswer.length,
-      vowels: vowels,
-      consonants: consonants,
-      wordType: this.categorizeWord(upperAnswer),
-      difficulty: this.assessDifficulty(upperAnswer),
-      hint: `This word starts with ${upperAnswer[0]} and ends with ${upperAnswer[upperAnswer.length - 1]}`,
-      letterFrequency: this.analyzeLetterFrequency(upperAnswer),
-      commonPatterns: this.identifyPatterns(upperAnswer)
-    }
-  }
-  
-  private categorizeWord(word: string): string {
-    // Categorizes word as noun, verb, adjective, etc.
-    const commonNouns = ['HOUSE', 'PLANT', 'WATER', 'STONE', 'LIGHT']
-    const commonVerbs = ['THINK', 'WRITE', 'SPEAK', 'LEARN', 'DANCE']
-    
-    if (commonNouns.some(noun => word.includes(noun.substring(0, 3)))) {
-      return 'common noun'
-    }
-    if (commonVerbs.some(verb => word.includes(verb.substring(0, 3)))) {
-      return 'action word'
-    }
-    return 'common word'
-  }
-  
-  private assessDifficulty(word: string): string {
-    const vowelCount = (word.match(/[AEIOU]/g) || []).length
-    const uncommonLetters = (word.match(/[QXZJ]/g) || []).length
-    
-    if (uncommonLetters > 0 || vowelCount <= 1) return 'hard'
-    if (vowelCount >= 3) return 'easy'
-    return 'medium'
-  }
-}
-```
-
-#### Hint Display Component (`components/wordle-answer-hints.tsx`)
-```typescript
-export function WordleAnswerHints({ gameNumber, hints }: Props) {
-  return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Today's Wordle Hints</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h3 className="font-semibold text-blue-800">Word Structure</h3>
-          <p>Length: {hints.length} letters</p>
-          <p>First letter: {hints.firstLetter}</p>
-          <p>Vowels: {hints.vowels.join(', ')}</p>
-          <p>Consonants: {hints.consonants.join(', ')}</p>
-        </div>
-        
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h3 className="font-semibold text-green-800">Word Info</h3>
-          <p>Type: {hints.wordType}</p>
-          <p>Difficulty: {hints.difficulty}</p>
-          <p className="mt-2 italic">"{hints.hint}"</p>
-        </div>
-      </div>
-      
-      <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-        <p className="text-sm text-gray-600">
-          These hints help you solve today's puzzle while keeping the challenge intact!
-        </p>
-      </div>
-    </div>
-  )
-}
-```
-
----
-
-### 3. 🔢 Game Number Calculation Fix
-
-**Problem**: Manual date-based calculation had cross-month/year boundary issues
-```typescript
-// ❌ Old problematic method
-const baseDate = new Date('2021-06-19')
-const gameNumber = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24)) + 1
-// Issues: Daylight saving time, leap years, timezone differences
-```
-
-**Solution**: Use official NYT API data directly
-```typescript
-// ✅ New reliable method
-const data = await fetchFromNYTAPI(dateStr)
-const gameNumber = data.days_since_launch // Official number from NYT
-```
-
-**Benefits**:
-- ✅ 100% accuracy matching official Wordle numbering
-- ✅ No calculation errors or edge cases
-- ✅ Automatically handles all date complexities
-- ✅ Future-proof against any NYT numbering changes
-
----
-
-### 4. 🗄️ Optimized Database Architecture
-
-#### Enhanced Schema (`lib/supabase/types.ts`)
-```typescript
-export interface WordlePrediction {
-  id: number
-  game_number: number              // Official game number from NYT
-  date: string                     // YYYY-MM-DD format
-  predicted_word?: string          // For future prediction features
-  verified_word: string            // Official answer from NYT
-  status: 'verified' | 'pending' | 'failed'
-  confidence_score: number         // 1.0 for official data
-  verification_sources: string[]   // ['NYT Official API']
-  hints: {                        // Structured hint data
-    firstLetter: string
-    length: number
-    vowels: string[]
-    consonants: string[]
-    wordType: string
-    difficulty: string
-    hint: string
-    letterFrequency?: Record<string, number>
-    commonPatterns?: string[]
-  }
-  created_at: string
-  updated_at: string
-}
-```
-
-#### Database Setup SQL
+### 数据库安全
 ```sql
--- Create optimized table for automated collection
-CREATE TABLE wordle_predictions (
-  id SERIAL PRIMARY KEY,
-  game_number INTEGER UNIQUE NOT NULL,
-  date DATE NOT NULL,
-  predicted_word TEXT,
-  verified_word TEXT NOT NULL,
-  status TEXT DEFAULT 'verified',
-  confidence_score DECIMAL DEFAULT 1.0,
-  verification_sources TEXT[] DEFAULT ARRAY['NYT Official API'],
-  hints JSONB NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable Row Level Security
+-- RLS (Row Level Security) 策略
 ALTER TABLE wordle_predictions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE player_stats ENABLE ROW LEVEL SECURITY;
 
--- Create policy for public read access
-CREATE POLICY "Public read access" ON wordle_predictions
-  FOR SELECT USING (true);
-
--- Create policy for service role write access
-CREATE POLICY "Service role write access" ON wordle_predictions
-  FOR ALL USING (auth.role() = 'service_role');
-
--- Create indexes for performance
-CREATE INDEX idx_wordle_predictions_game_number ON wordle_predictions(game_number);
-CREATE INDEX idx_wordle_predictions_date ON wordle_predictions(date);
-CREATE INDEX idx_wordle_predictions_status ON wordle_predictions(status);
+-- 用户只能访问自己的数据
+CREATE POLICY "Users can view own stats" ON player_stats
+  FOR SELECT USING (auth.uid() = user_id);
 ```
 
----
+## 🚀 部署指南
 
-### 5. 🧪 Comprehensive Testing & Verification
+### Vercel部署
+1. **连接GitHub仓库**
+   ```bash
+   # 推送代码到GitHub
+   git push origin main
+   ```
 
-#### Network Testing Scripts
+2. **配置环境变量**
+   - 在Vercel控制台设置所有必需的环境变量
+   - 确保CRON_SECRET的安全性
+
+3. **域名配置**
+   ```bash
+   # 在Vercel中添加自定义域名
+   Domain: puzzlerank.pro
+   SSL: 自动配置
+   ```
+
+### Supabase配置
+1. **创建项目**
+   - 在Supabase控制台创建新项目
+   - 获取URL和API密钥
+
+2. **执行数据库迁移**
+   ```sql
+   -- 执行scripts/目录下的SQL文件
+   -- 按顺序执行所有迁移脚本
+   ```
+
+3. **配置认证**
+   ```sql
+   -- 启用邮箱认证
+   -- 配置OAuth提供商（可选）
+   ```
+
+## 🐛 故障排除
+
+### 常见问题
+
+#### 1. 数据采集失败
 ```bash
-# Test proxy access to NYT API
-node scripts/test-proxy.js
-# Expected: ✅ SUCCESS with AllOrigins!
+# 检查Cron任务状态
+curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
+     https://puzzlerank.pro/api/wordle/auto
 
-# Test automated collection API
-curl http://localhost:3001/api/wordle/auto-collect
-# Expected: {"success":true,"data":{"gameNumber":1515,"answer":"NOMAD",...}}
-
-# Network diagnostics
-node scripts/network-diagnosis.js
-# Diagnoses connectivity issues and suggests solutions
+# 查看采集日志
+# 访问 /admin/collection 页面
 ```
 
-#### Verification Checklist
+#### 2. 数据库连接问题
+```typescript
+// 检查环境变量
+console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log('Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✓' : '✗');
+```
+
+#### 3. TypeScript编译错误
 ```bash
-# 1. Verify NYT API access
-✅ Proxy service working: AllOrigins successful
-✅ Data format correct: JSON with solution, days_since_launch
-✅ Response time acceptable: ~1 second average
+# 检查类型定义
+pnpm type-check
 
-# 2. Verify automated collection
-✅ Cron job configured: vercel.json setup complete
-✅ API endpoint working: /api/wordle/auto-collect returns 200
-✅ Database writes successful: Data appears in Supabase
-
-# 3. Verify hint system
-✅ Hints generated correctly: Structured data format
-✅ No direct answers shown: Game challenge preserved
-✅ User-friendly display: React component working
-
-# 4. Verify game numbers
-✅ Numbers match official: Using days_since_launch
-✅ No calculation errors: Direct from NYT API
-✅ Consistent across dates: Automated verification
+# 修复常见类型错误
+# 确保所有数据库字段类型匹配
 ```
 
----
+### 修复历史记录
 
-### 6. 🚀 Production Deployment Configuration
+#### 最近修复的问题 (2025-08-22)
+1. **数据库系统迁移**: 从旧的wordle-db迁移到Supabase WordlePredictionDB
+2. **TypeScript类型错误**: 修复所有类型不匹配问题
+3. **NYT官方API集成**: 修复URL格式和游戏编号计算
+4. **数据采集逻辑**: 修复getTodayPrediction查询逻辑
+5. **状态字段修正**: 使用正确的'candidate'|'verified'|'rejected'状态值
 
-#### Vercel Environment Setup
+#### 提交历史
 ```bash
-# Required environment variables
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-NEXT_PUBLIC_SITE_URL=https://puzzlerank.pro
+840278c - fix: 一次性修复所有TypeScript类型错误 - 使用正确的status值
+4b33030 - fix: 修复verified_word字段类型 - 使用undefined替代null
+cb91e1a - fix: 修复TypeScript const断言错误
+121c70b - fix: 修复collectTodayAnswer方法缺少日期参数
+1a689e3 - fix: 修复TypeScript类型错误 - word字段可能为undefined
+bd0ff28 - fix: 修复wordle-updater使用新的Supabase数据库系统
 ```
 
-#### Deployment Verification Steps
-```bash
-# 1. Deploy to Vercel
-vercel --prod
+## 📊 监控和分析
 
-# 2. Verify cron job is active
-# Check Vercel dashboard > Functions > Crons
+### 性能监控
+- **Vercel Analytics**: 页面性能和用户行为分析
+- **Core Web Vitals**: LCP, FID, CLS指标监控
+- **错误追踪**: 自动错误收集和报告
 
-# 3. Test production API
-curl https://puzzlerank.pro/api/wordle/auto-collect
-
-# 4. Verify database connection
-# Check Supabase dashboard for new entries
-
-# 5. Test user-facing pages
-# Visit https://puzzlerank.pro/todays-wordle-answer
-```
-
----
-
-### 7. 📊 Performance Metrics & Results
-
-#### System Performance
-```
-Automation Success Rate: 100%
-Data Accuracy: 100% (official NYT source)
-Response Time: ~1 second average
-Uptime: 99.9% (Vercel managed)
-Database Write Success: 100%
-Hint Generation Speed: <100ms
-```
-
-#### User Experience Improvements
-```
-✅ No manual data entry required
-✅ Daily automatic updates
-✅ Consistent game numbering
-✅ Hint-based answers preserve game challenge
-✅ Mobile-optimized responsive design
-✅ International English interface
-✅ Fast page load times (<2 seconds)
-```
-
-#### Technical Achievements
-```
-✅ Network restrictions bypassed via proxy
-✅ Official NYT API integration successful
-✅ Automated cron job system working
-✅ Database schema optimized for automation
-✅ Comprehensive error handling implemented
-✅ Full testing suite created
-```
-
----
-
-### 8. 🔧 Troubleshooting Guide
-
-#### Common Issues & Solutions
-
-**Issue**: Cron job not executing
-```bash
-# Check Vercel deployment status
-vercel ls
-
-# Verify vercel.json configuration
-cat vercel.json
-
-# Check function logs in Vercel dashboard
-```
-
-**Issue**: NYT API access failing
-```bash
-# Test proxy service directly
-node scripts/test-proxy.js
-
-# Check network connectivity
-node scripts/network-diagnosis.js
-
-# Verify proxy service status
-curl https://api.allorigins.win/get?url=https://www.nytimes.com
-```
-
-**Issue**: Database connection problems
-```bash
-# Verify environment variables
-echo $NEXT_PUBLIC_SUPABASE_URL
-echo $NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-# Test database connection
-node -e "
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-supabase.from('wordle_predictions').select('*').limit(1).then(console.log);
-"
-```
-
-**Issue**: Hint generation errors
-```bash
-# Test hint generator directly
-node -e "
-const { AnswerHintGenerator } = require('./lib/answer-hint-generator');
-const generator = new AnswerHintGenerator();
-console.log(generator.generateHints('NOMAD'));
-"
-```
-
----
-
-### 9. 🔄 Maintenance & Monitoring
-
-#### Daily Monitoring
-```bash
-# Check cron execution logs
-# Vercel Dashboard > Functions > View Function Logs
-
-# Verify database updates
-# Supabase Dashboard > Table Editor > wordle_predictions
-
-# Monitor API health
-curl https://puzzlerank.pro/api/wordle/auto-collect
-```
-
-#### Weekly Tasks
-- [ ] Review collection success rate
-- [ ] Check hint quality and accuracy
-- [ ] Monitor database performance
-- [ ] Verify user experience metrics
-
-#### Monthly Tasks
-- [ ] Update dependencies
-- [ ] Review and optimize database queries
-- [ ] Analyze user feedback
-- [ ] Plan feature improvements
-
----
-
-### 10. 🎯 Success Metrics Summary
-
-#### Technical Success
-- **100% Automation**: Zero manual intervention required
-- **100% Data Accuracy**: Official NYT API source
-- **99.9% Uptime**: Reliable Vercel infrastructure
-- **<2s Response Time**: Fast user experience
-
-#### Business Success
-- **Game Integrity Preserved**: Hint-based system maintains challenge
-- **Global Accessibility**: English interface for international users
-- **SEO Optimized**: Structured data and meta tags
-- **Mobile Friendly**: Responsive design for all devices
-
-#### User Experience Success
-- **Daily Fresh Content**: Automated updates every day
-- **Helpful Hints**: Structured guidance without spoilers
-- **Fast Loading**: Optimized performance
-- **Reliable Service**: Consistent availability
-
----
-
-**🎉 Complete System Transformation Achieved**: From manual, error-prone data entry to fully automated, reliable, official data collection with intelligent hint generation and global accessibility.
-
-## 📁 Optimized Project Structure
-
-```
-puzzlerank.pro/
-├── app/
-│   ├── api/wordle/auto-collect/route.ts    # 🤖 Automated collection API
-│   ├── todays-wordle-answer/page.tsx       # 💡 Hint-based answer page
-│   └── daily-hints/page.tsx                # 📅 Daily hints page
-├── lib/
-│   ├── nyt-proxy-collector.ts              # 🌐 Proxy-based NYT collector
-│   ├── answer-hint-generator.ts            # 🎯 Hint generation system
-│   ├── supabase/types.ts                   # 🗄️ Optimized database types
-│   └── fallback-collector.ts               # 🔄 Backup data source
-├── components/
-│   └── wordle-answer-hints.tsx             # 💡 Hint display component
-├── scripts/
-│   ├── test-proxy.js                       # 🧪 Network testing scripts
-│   ├── test-nyt-api.js                     # 🧪 API testing scripts
-│   └── network-diagnosis.js                # 🔍 Network diagnostics
-└── vercel.json                             # ⚙️ Vercel cron configuration
-```
-
-## 🧪 Testing & Verification
-
-### Network Testing Scripts
-
-**Test Proxy Access**:
-```bash
-node scripts/test-proxy.js
-# Expected output: ✅ SUCCESS with AllOrigins!
-```
-
-**Test Auto Collection**:
-```bash
-curl http://localhost:3001/api/wordle/auto-collect
-# Expected: {"success":true,"data":{"gameNumber":1515,"answer":"NOMAD",...}}
-```
-
-**Network Diagnostics**:
-```bash
-node scripts/network-diagnosis.js
-# Diagnoses network connectivity issues
-```
-
-### Verification Checklist
-
-- [ ] ✅ NYT API accessible via proxy
-- [ ] ✅ Cron job executes daily
-- [ ] ✅ Database updates automatically
-- [ ] ✅ Hints generated correctly
-- [ ] ✅ No direct answers shown
-- [ ] ✅ Game numbers match official
-- [ ] ✅ International interface (English only)
-
-## 🚀 Deployment Guide
-
-### 1. Vercel Deployment
-
-```bash
-# 1. Build and deploy
-npm run build
-vercel --prod
-
-# 2. Configure environment variables in Vercel dashboard
-# 3. Verify cron jobs are enabled
-# 4. Test API endpoints
-```
-
-### 2. Environment Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` |
-
-### 3. Supabase Setup
-
+### 数据分析
 ```sql
--- Create optimized table
-CREATE TABLE wordle_predictions (
-  id SERIAL PRIMARY KEY,
-  game_number INTEGER UNIQUE NOT NULL,
-  date DATE NOT NULL,
-  verified_word TEXT NOT NULL,
-  hints JSONB,
-  verification_sources TEXT[] DEFAULT ARRAY['NYT Official API'],
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable RLS
-ALTER TABLE wordle_predictions ENABLE ROW LEVEL SECURITY;
-
--- Create policy for public read access
-CREATE POLICY "Public read access" ON wordle_predictions
-  FOR SELECT USING (true);
+-- 获取系统统计
+SELECT 
+  COUNT(*) as total_predictions,
+  COUNT(*) FILTER (WHERE status = 'verified') as verified_count,
+  AVG(confidence_score) as avg_confidence
+FROM wordle_predictions;
 ```
 
-## 🔧 Troubleshooting
+## 🤝 贡献指南
 
-### Common Issues & Solutions
+### 开发流程
+1. Fork项目仓库
+2. 创建功能分支: `git checkout -b feature/new-feature`
+3. 提交更改: `git commit -m 'Add new feature'`
+4. 推送分支: `git push origin feature/new-feature`
+5. 创建Pull Request
 
-**1. Network Access Issues**
-```
-❌ Error: Connect Timeout Error (www.nytimes.com:443)
-✅ Solution: System automatically uses proxy services
-```
+### 代码规范
+- 使用TypeScript进行类型安全开发
+- 遵循ESLint和Prettier配置
+- 编写单元测试覆盖核心功能
+- 更新相关文档
 
-**2. Cron Job Not Running**
-```
-❌ Issue: Vercel cron not executing
-✅ Solution: Check vercel.json configuration and redeploy
-```
+## 📄 许可证
 
-**3. Database Connection Issues**
-```
-❌ Error: Invalid API key
-✅ Solution: Verify SUPABASE_ANON_KEY in environment variables
-```
+MIT License - 详见 [LICENSE](LICENSE) 文件
 
-**4. Hint Generation Errors**
-```
-❌ Error: Cannot read property 'length' of undefined
-✅ Solution: Check answer format and hint generator logic
-```
+## 🔗 相关链接
 
-## 📊 Performance Metrics
-
-### Automated Collection System
-- **Success Rate**: 100% (with proxy fallback)
-- **Response Time**: ~1 second average
-- **Uptime**: 24/7 automated collection
-- **Data Accuracy**: Official NYT API source
-
-### User Experience
-- **Page Load Time**: <2 seconds
-- **Mobile Performance**: 95+ Lighthouse score
-- **Accessibility**: WCAG 2.1 AA compliant
-- **SEO Score**: 100/100
-
-## 🔄 Maintenance
-
-### Daily Operations
-- ✅ **Automated**: Data collection via cron jobs
-- ✅ **Automated**: Database updates
-- ✅ **Automated**: Hint generation
-- ✅ **Manual**: Monitor system health
-
-### Weekly Tasks
-- [ ] Review collection logs
-- [ ] Check database performance
-- [ ] Verify hint quality
-- [ ] Monitor user feedback
-
-### Monthly Tasks
-- [ ] Update dependencies
-- [ ] Review analytics data
-- [ ] Optimize performance
-- [ ] Plan new features
-
-## 🤝 Contributing
-
-### Development Setup
-```bash
-# 1. Fork and clone
-git clone https://github.com/yourusername/puzzlerank.pro.git
-
-# 2. Install dependencies
-npm install
-
-# 3. Set up environment
-cp .env.example .env.local
-
-# 4. Run development server
-npm run dev
-
-# 5. Test automated collection
-npm run test:collection
-```
-
-### Code Standards
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Airbnb configuration
-- **Prettier**: Code formatting
-- **Testing**: Jest + React Testing Library
-
-## 📝 Changelog
-
-### Version 2.0.0 (August 12, 2025)
-- ✅ **NEW**: Fully automated NYT API collection system
-- ✅ **NEW**: Proxy-based network access solution
-- ✅ **NEW**: Intelligent hint generation (no direct answers)
-- ✅ **FIXED**: Game number calculation using official API data
-- ✅ **IMPROVED**: Database schema with structured hints
-- ✅ **IMPROVED**: International interface (English only)
-- ✅ **ADDED**: Comprehensive testing and diagnostics tools
-
-### Version 1.3.1 (August 10, 2025)
-- Basic manual data collection
-- Simple hint system
-- Manual game number calculation
-
-## 🔗 Links
-
-- **Live Site**: [https://puzzlerank.pro](https://puzzlerank.pro)
-- **GitHub**: [Repository Link]
-- **Supabase**: [Dashboard Link]
-- **Vercel**: [Deployment Dashboard]
-
-## 📞 Support
-
-### Technical Issues
-- **GitHub Issues**: Report bugs and feature requests
-- **Documentation**: This README covers all setup procedures
-- **Testing Scripts**: Use provided scripts for diagnostics
-
-### System Monitoring
-- **Cron Jobs**: Monitor via Vercel dashboard
-- **Database**: Monitor via Supabase dashboard
-- **API Health**: Test endpoints regularly
+- **生产环境**: https://puzzlerank.pro
+- **GitHub仓库**: https://github.com/tianwen8/puzzlerank.pro
+- **问题反馈**: https://github.com/tianwen8/puzzlerank.pro/issues
+- **技术文档**: 查看docs/目录下的详细文档
 
 ---
 
-## 🎯 Success Metrics
+**最后更新**: 2025-08-22
+**版本**: 2.4.0
+**维护者**: tianwen8
 
-### Automation Success
-- ✅ **100% Automated**: No manual data entry required
-- ✅ **Official Data**: Direct from NYT API
-- ✅ **Real-time**: Updates within minutes of official release
-- ✅ **Reliable**: Proxy fallback ensures 99.9% uptime
-
-### User Experience
-- ✅ **Hint-based**: Maintains game challenge
-- ✅ **Fast Loading**: <2 second page loads
-- ✅ **Mobile Optimized**: Perfect on all devices
-- ✅ **International**: English interface for global users
-
-**Built with ❤️ using Next.js 14, Supabase, Vercel Cron Jobs, and intelligent automation**
-
----
-
-*This README provides complete instructions for replicating the entire system. Follow the steps in order for a perfect deployment.*
+如有任何问题或建议，欢迎提交Issue或Pull Request！
