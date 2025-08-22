@@ -93,7 +93,7 @@ export class WordlePredictionDB {
     return baseGameNumber + diffDays;
   }
   
-  // 获取今日预测 - 返回今天的最新答案
+  // 获取今日预测 - 返回今天日期对应的数据
   static async getTodayPrediction(): Promise<WordlePrediction | null> {
     const supabase = getSupabaseClient()
     
@@ -102,19 +102,24 @@ export class WordlePredictionDB {
     }
     
     try {
-      // 获取最新的已验证答案（按游戏编号降序）
+      const today = new Date().toISOString().split('T')[0]
+      const todayGameNumber = this.calculateGameNumber(today)
+      
+      console.log(`🔍 查询今日预测: ${today} = #${todayGameNumber}`)
+      
+      // 获取今天游戏编号对应的数据
       const { data, error } = await supabase
         .from('wordle_predictions')
         .select('*')
-        .eq('status', 'verified')
-        .order('game_number', { ascending: false })
-        .limit(1)
+        .eq('game_number', todayGameNumber)
         .single()
       
       if (error && error.code !== 'PGRST116') {
         console.error('Failed to get today prediction:', error)
         return await getFallbackDB().getTodayPrediction()
       }
+      
+      console.log(`📊 今日预测结果:`, data ? `#${data.game_number} - ${data.verified_word || data.predicted_word} (${data.status})` : '无数据')
       
       return data
     } catch (error) {
