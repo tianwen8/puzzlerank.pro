@@ -146,7 +146,7 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
     if (successfulResults.length === 0) {
       // 没有获取到任何数据，使用NYT官方API作为备用
       const nytCollector = new NYTOfficialCollector();
-      const nytResult = await nytCollector.collectTodayAnswer();
+      const nytResult = await nytCollector.collectTodayAnswer(today);
       
       if (nytResult.success && nytResult.data) {
         const prediction = {
