@@ -19,10 +19,26 @@ interface CollectionResult {
 export class NYTOfficialCollector {
   private readonly baseUrl = 'https://www.nytimes.com/svc/wordle/v2'
   
+  // 计算游戏编号（与数据库中的方法保持一致）
+  private calculateGameNumber(date: string): number {
+    // 基于2025-08-07 = #1510计算
+    const baseDate = new Date('2025-08-07');
+    const baseGameNumber = 1510;
+    
+    const targetDate = new Date(date);
+    const diffTime = targetDate.getTime() - baseDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    return baseGameNumber + diffDays;
+  }
+  
   async collectTodayAnswer(dateStr: string): Promise<CollectionResult> {
     try {
-      const url = `${this.baseUrl}/${dateStr}.json`
-      console.log(`Fetching from NYT API: ${url}`)
+      // NYT API实际使用游戏编号，不是日期
+      // 计算今天对应的游戏编号
+      const gameNumber = this.calculateGameNumber(dateStr)
+      const url = `${this.baseUrl}/${gameNumber}.json`
+      console.log(`Fetching from NYT API: ${url} (date: ${dateStr}, game: #${gameNumber})`)
       
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
