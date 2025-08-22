@@ -225,7 +225,7 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
       game_number: gameNumber,
       date: today,
       predicted_word: bestWord,
-      verified_word: isVerified ? bestWord : null,
+      verified_word: isVerified ? bestWord : undefined,
       status: status as 'verified' | 'predicted',
       confidence_score: confidenceScore,
       verification_sources: bestInfo.sources,
