@@ -126,7 +126,7 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
       return {
         success: true,
         gameNumber: existingAnswer.game_number,
-        word: existingAnswer.verified_word || existingAnswer.predicted_word,
+        word: existingAnswer.verified_word || existingAnswer.predicted_word || '',
         verified: true,
         sources: existingAnswer.verification_sources || [],
         message: '使用数据库中的已验证答案'
@@ -260,7 +260,7 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
       return {
         success: false,
         gameNumber: existingAnswer.game_number,
-        word: existingAnswer.verified_word || existingAnswer.predicted_word,
+        word: existingAnswer.verified_word || existingAnswer.predicted_word || '',
         verified: existingAnswer.status === 'verified',
         sources: existingAnswer.verification_sources || [],
         message: '更新失败，使用数据库中的现有答案'
