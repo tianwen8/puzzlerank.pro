@@ -114,22 +114,21 @@ async function fetchFromSource(source: typeof DATA_SOURCES[0]): Promise<{word: s
 
 // 多源验证和更新
 export async function updateTodayAnswer(): Promise<UpdateResult> {
-  const db = getWordleDB();
   const today = new Date().toISOString().split('T')[0];
   
   try {
     console.log('🚀 开始更新今日Wordle答案...');
     
     // 1. 检查数据库中是否已有今日答案
-    const existingAnswer = db.getTodayAnswer();
-    if (existingAnswer && existingAnswer.verified && existingAnswer.confidenceScore >= 90) {
+    const existingAnswer = await WordlePredictionDB.getTodayPrediction();
+    if (existingAnswer && existingAnswer.status === 'verified' && existingAnswer.confidence_score >= 0.9) {
       console.log('✅ 数据库中已有高置信度答案，跳过更新');
       return {
         success: true,
-        gameNumber: existingAnswer.gameNumber,
-        word: existingAnswer.word,
-        verified: existingAnswer.verified,
-        sources: existingAnswer.sources,
+        gameNumber: existingAnswer.game_number,
+        word: existingAnswer.verified_word || existingAnswer.predicted_word,
+        verified: true,
+        sources: existingAnswer.verification_sources || [],
         message: '使用数据库中的已验证答案'
       };
     }
@@ -145,31 +144,48 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
       .map(r => r.value);
     
     if (successfulResults.length === 0) {
-      // 没有获取到任何数据，使用计算的游戏编号和备用答案
-      const calculatedGameNumber = db.calculateTodayGameNumber();
-      const backupWord = 'GROAN'; // 根据Tom's Guide，今天应该是GROAN
+      // 没有获取到任何数据，使用NYT官方API作为备用
+      const nytCollector = new NYTOfficialCollector();
+      const nytResult = await nytCollector.collectTodayAnswer();
       
-      const record: Omit<WordleRecord, 'id' | 'createdAt' | 'updatedAt'> = {
-        gameNumber: calculatedGameNumber,
-        date: today,
-        word: backupWord,
-        verified: false,
-        sources: ['calculated'],
-        confidenceScore: 50,
-        category: 'Emotions',
-        difficulty: 'Medium',
-        verificationTime: new Date().toISOString()
-      };
-      
-      db.upsertAnswer(record);
+      if (nytResult.success && nytResult.data) {
+        const prediction = {
+          game_number: nytResult.data.gameNumber,
+          date: today,
+          predicted_word: nytResult.data.answer,
+          verified_word: nytResult.data.answer,
+          status: 'verified' as const,
+          confidence_score: 1.0,
+          verification_sources: ['NYT Official API'],
+          hints: {
+            category: 'daily',
+            difficulty: 'confirmed',
+            clues: [`Today's Wordle answer is ${nytResult.data.answer}`],
+            letterHints: generateLetterHints(nytResult.data.answer)
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        await WordlePredictionDB.upsertPrediction(prediction);
+        
+        return {
+          success: true,
+          gameNumber: nytResult.data.gameNumber,
+          word: nytResult.data.answer,
+          verified: true,
+          sources: ['NYT Official API'],
+          message: '使用NYT官方API获取答案'
+        };
+      }
       
       return {
         success: false,
-        gameNumber: calculatedGameNumber,
-        word: backupWord,
+        gameNumber: 0,
+        word: '',
         verified: false,
-        sources: ['calculated'],
-        message: '所有数据源失败，使用计算的答案'
+        sources: [],
+        message: '所有数据源失败'
       };
     }
     
@@ -194,33 +210,35 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
       .sort(([,a], [,b]) => b.weight - a.weight)[0];
     
     const isVerified = bestInfo.count >= 2 || bestInfo.weight >= 15;
-    const confidenceScore = Math.min(100, bestInfo.weight * 5 + bestInfo.count * 10);
-    const gameNumber = bestInfo.gameNumber || db.calculateTodayGameNumber();
+    const confidenceScore = Math.min(1.0, (bestInfo.weight * 0.05 + bestInfo.count * 0.1));
+    
+    // 计算游戏编号
+    const baseDate = new Date('2021-06-19'); // Wordle开始日期
+    const todayDate = new Date(today);
+    const diffTime = todayDate.getTime() - baseDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const gameNumber = bestInfo.gameNumber || diffDays;
     
     // 4. 保存到数据库
-    const record: Omit<WordleRecord, 'id' | 'createdAt' | 'updatedAt'> = {
-      gameNumber,
+    const prediction = {
+      game_number: gameNumber,
       date: today,
-      word: bestWord,
-      verified: isVerified,
-      sources: bestInfo.sources,
-      confidenceScore,
-      category: 'General', // 可以根据单词自动分类
-      difficulty: 'Medium', // 可以根据单词难度自动判断
-      verificationTime: new Date().toISOString()
+      predicted_word: bestWord,
+      verified_word: isVerified ? bestWord : null,
+      status: (isVerified ? 'verified' : 'predicted') as const,
+      confidence_score: confidenceScore,
+      verification_sources: bestInfo.sources,
+      hints: {
+        category: 'daily',
+        difficulty: 'medium',
+        clues: [`Today's Wordle answer might be ${bestWord}`],
+        letterHints: generateLetterHints(bestWord)
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
     
-    db.upsertAnswer(record);
-    
-    // 5. 记录所有数据源的结果
-    successfulResults.forEach(({ source, result }) => {
-      db.recordSourceData({
-        gameNumber,
-        sourceName: source,
-        word: result.word,
-        success: true
-      });
-    });
+    await WordlePredictionDB.upsertPrediction(prediction);
     
     console.log(`🎯 更新完成: ${bestWord} (#${gameNumber}) - ${isVerified ? '已验证' : '未验证'}`);
     
@@ -237,24 +255,28 @@ export async function updateTodayAnswer(): Promise<UpdateResult> {
     console.error('❌ 更新失败:', error);
     
     // 错误处理：返回数据库中的现有答案或计算答案
-    const existingAnswer = db.getTodayAnswer();
+    const existingAnswer = await WordlePredictionDB.getTodayPrediction();
     if (existingAnswer) {
       return {
         success: false,
-        gameNumber: existingAnswer.gameNumber,
-        word: existingAnswer.word,
-        verified: existingAnswer.verified,
-        sources: existingAnswer.sources,
+        gameNumber: existingAnswer.game_number,
+        word: existingAnswer.verified_word || existingAnswer.predicted_word,
+        verified: existingAnswer.status === 'verified',
+        sources: existingAnswer.verification_sources || [],
         message: '更新失败，使用数据库中的现有答案'
       };
     }
     
     // 最后的备用方案
-    const calculatedGameNumber = db.calculateTodayGameNumber();
+    const baseDate = new Date('2021-06-19');
+    const todayDate = new Date(today);
+    const diffTime = todayDate.getTime() - baseDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
     return {
       success: false,
-      gameNumber: calculatedGameNumber,
-      word: 'GROAN',
+      gameNumber: diffDays,
+      word: '',
       verified: false,
       sources: ['fallback'],
       message: '更新失败，使用备用答案'
