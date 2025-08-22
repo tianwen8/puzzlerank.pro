@@ -1,4 +1,5 @@
 import { WordlePredictionDB, VerificationSource } from './database/wordle-prediction-db'
+import { NYTOfficialCollector } from './nyt-official-collector'
 
 // 采集结果接口
 interface CollectionResult {
@@ -36,13 +37,55 @@ export class WordleCollector {
   async collectTodayAnswer(gameNumber: number): Promise<CollectionResult[]> {
     console.log(`开始采集 Wordle #${gameNumber} 答案...`)
     
+    const results: CollectionResult[] = []
+    
+    // 首先尝试NYT官方API（最高优先级）
+    console.log('🎯 尝试NYT官方API采集...')
+    const nytCollector = new NYTOfficialCollector()
+    const today = new Date().toISOString().split('T')[0]
+    
+    try {
+      const nytResult = await nytCollector.collectTodayAnswer(today)
+      if (nytResult.success && nytResult.data) {
+        console.log(`✅ NYT官方API成功: ${nytResult.data.answer}`)
+        results.push({
+          source: 'NYT Official API',
+          word: nytResult.data.answer,
+          success: true,
+          responseTime: 1000, // 估算响应时间
+          rawData: nytResult.data
+        })
+        
+        // 如果NYT官方API成功，直接返回，不需要其他源
+        await this.logResults(gameNumber, results)
+        return results
+      } else {
+        console.log(`❌ NYT官方API失败: ${nytResult.error}`)
+        results.push({
+          source: 'NYT Official API',
+          success: false,
+          responseTime: 1000,
+          error: nytResult.error
+        })
+      }
+    } catch (error) {
+      console.log(`❌ NYT官方API异常: ${error}`)
+      results.push({
+        source: 'NYT Official API',
+        success: false,
+        responseTime: 1000,
+        error: error instanceof Error ? error.message : String(error)
+      })
+    }
+    
+    // 如果NYT官方API失败，继续使用其他源作为备用
+    console.log('🔄 NYT官方API失败，使用备用采集源...')
+    
     if (this.sources.length === 0) {
       await this.loadConfig()
     }
     
-    const results: CollectionResult[] = []
-    
-    // 并行采集所有源
+    // 并行采集所有备用源
     const promises = this.sources.map(source => 
       this.collectFromSource(source, gameNumber)
     )
