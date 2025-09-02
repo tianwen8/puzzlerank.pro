@@ -386,20 +386,3 @@ export default async function WordleGameNumberPage({ params }: PageProps) {
     </>
   )
 }
-
-// 生成静态参数（用于构建时预生成热门页面）
-export async function generateStaticParams() {
-  try {
-    // 预生成最近30天的页面
-    const recentPredictions = await WordlePredictionDB.getHistoryPredictions(30)
-    
-    return recentPredictions
-      .filter(p => p.verified_word)
-      .map(p => ({
-        gameNumber: p.game_number.toString()
-      }))
-  } catch (error) {
-    console.error('生成静态参数失败:', error)
-    return []
-  }
-}
