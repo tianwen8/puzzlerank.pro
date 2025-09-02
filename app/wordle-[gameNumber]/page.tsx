@@ -41,7 +41,7 @@ interface PageProps {
 // 获取指定游戏期数的Wordle数据
 async function getWordleData(gameNumber: number) {
   try {
-    const prediction = await WordlePredictionDB.getPredictionByGameNumber(gameNumber)
+    const prediction = await WordlePredictionDB.getGameByNumber(gameNumber)
     if (!prediction || !prediction.verified_word) {
       return null
     }
@@ -69,8 +69,8 @@ async function getWordleData(gameNumber: number) {
 // 获取相邻游戏期数
 async function getAdjacentGameNumbers(currentGameNumber: number) {
   try {
-    const previous = await WordlePredictionDB.getPredictionByGameNumber(currentGameNumber - 1)
-    const next = await WordlePredictionDB.getPredictionByGameNumber(currentGameNumber + 1)
+    const previous = await WordlePredictionDB.getGameByNumber(currentGameNumber - 1)
+    const next = await WordlePredictionDB.getGameByNumber(currentGameNumber + 1)
     
     return {
       previous: previous?.verified_word ? currentGameNumber - 1 : null,
@@ -320,9 +320,12 @@ export default async function WordleGameNumberPage({ params }: PageProps) {
           </CardHeader>
           <CardContent>
             <WordleAnswerHints 
-              word={word}
               gameNumber={gameNumber}
+              date={date}
+              answer={word}
               hints={hints}
+              status={status}
+              confidence={confidence}
             />
           </CardContent>
         </Card>
