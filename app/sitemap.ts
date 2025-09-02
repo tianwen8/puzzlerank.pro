@@ -23,6 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.95,
     },
     
+
+    
     // Legacy daily-hints redirect
     {
       url: `${baseUrl}/daily-hints`,
@@ -86,6 +88,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    
+    // 动态生成所有Wordle游戏期数页面
+    ...(await generateWordleGamePages(baseUrl)),
   ]
 
   // Dynamic Wordle game pages
@@ -130,4 +135,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   return [...staticPages, ...gamePages]
+}
+
+// 生成所有Wordle游戏期数页面的sitemap条目
+async function generateWordleGamePages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
+  try {
+    // 获取所有已验证的Wordle预测数据
+    const predictions = await WordlePredictionDB.getHistoryPredictions(1000) // 获取最近1000个
+    
+    return predictions
+      .filter(p => p.verified_word && p.status === 'verified')
+      .map(p => {
+        const isRecent = new Date(p.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 最近30天
+        const isToday = new Date(p.date).toDateString() === new Date().toDateString()
+        
+        return {
+          url: `${baseUrl}/wordle-${p.game_number}`,
+          lastModified: new Date(p.updated_at || p.date),
+          changeFrequency: isToday ? 'hourly' as const : isRecent ? 'daily' as const : 'weekly' as const,
+          priority: isToday ? 0.95 : isRecent ? 0.85 : 0.75,
+        }
+      })
+      .sort((a, b) => {
+        // 按游戏期数降序排列（最新的在前）
+        const gameNumberA = parseInt(a.url.split('/wordle-')[1])
+        const gameNumberB = parseInt(b.url.split('/wordle-')[1])
+        return gameNumberB - gameNumberA
+      })
+  } catch (error) {
+    console.error('生成Wordle游戏页面sitemap失败:', error)
+    return []
+  }
 }

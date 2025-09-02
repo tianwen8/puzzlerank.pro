@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { WordlePredictionDBFallback } from './wordle-prediction-db-fallback'
+import { notifyNewWordleAnswer } from '../seo-notification'
 
 // 延迟初始化 Supabase 客户端
 let supabaseAdmin: any = null
@@ -247,6 +248,17 @@ export class WordlePredictionDB {
       return false
     }
     
+    // 如果状态更新为verified，通知搜索引擎
+    if (status === 'verified') {
+      try {
+        await notifyNewWordleAnswer(gameNumber)
+        console.log(`SEO notification sent for game ${gameNumber}`)
+      } catch (error) {
+        console.error(`Failed to send SEO notification for game ${gameNumber}:`, error)
+        // 不影响主要功能，继续执行
+      }
+    }
+    
     return true
   }
   
@@ -384,6 +396,34 @@ export class WordlePredictionDB {
     } catch (error) {
       console.error('Supabase error, using fallback:', error)
       return await getFallbackDB().getStats()
+    }
+  }
+
+  // 获取最近的预测记录
+  static async getRecentPredictions(limit: number = 10): Promise<WordlePrediction[]> {
+    const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      // 使用 JSON 文件备用
+      return await getFallbackDB().getRecentPredictions(limit)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('wordle_predictions')
+        .select('*')
+        .order('game_number', { ascending: false })
+        .limit(limit)
+      
+      if (error) {
+        console.error('Failed to get recent predictions:', error)
+        return await getFallbackDB().getRecentPredictions(limit)
+      }
+      
+      return data || []
+    } catch (error) {
+      console.error('Failed to get recent predictions:', error)
+      return await getFallbackDB().getRecentPredictions(limit)
     }
   }
 }

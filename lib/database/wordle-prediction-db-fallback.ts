@@ -146,6 +146,13 @@ class WordlePredictionDBFallback {
       { name: 'historical', weight: 1.0, active: true }
     ]
   }
+
+  async getRecentPredictions(limit: number = 10): Promise<WordlePrediction[]> {
+    const data = this.readData()
+    return data.predictions
+      .sort((a, b) => b.game_number - a.game_number)
+      .slice(0, limit)
+  }
 }
 
 export { WordlePredictionDBFallback }
