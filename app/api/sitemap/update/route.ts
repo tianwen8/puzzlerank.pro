@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
 
     // Submit to search engines
     const submissionResults = {
-      google: { status: 'not_attempted', error: null },
-      bing: { status: 'not_attempted', error: null }
+      google: { status: 'not_attempted', error: null as string | null },
+      bing: { status: 'not_attempted', error: null as string | null }
     }
 
     // Submit to Google (using IndexNow API or Google Search Console ping)

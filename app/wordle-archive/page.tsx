@@ -193,20 +193,22 @@ export default async function WordleArchivePage() {
           <div className="space-y-8">
             {Object.entries(gamesByMonth)
               .sort(([a], [b]) => b.localeCompare(a)) // Sort by month descending
-              .map(([monthKey, monthData]) => (
+              .map(([monthKey, monthData]) => {
+                const typedMonthData = monthData as { name: string; games: any[] }
+                return (
                 <Card key={monthKey}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      {monthData.name}
+                      {typedMonthData.name}
                       <Badge variant="outline" className="ml-auto">
-                        {monthData.games.length} puzzles
+                        {typedMonthData.games.length} puzzles
                       </Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3">
-                      {monthData.games.map((game) => {
+                      {typedMonthData.games.map((game) => {
                         const answer = game.verified_word || game.predicted_word || 'UNKNOWN'
                         const gameDate = new Date(game.date)
                         const difficulty = game.hints?.difficulty || 'Medium'
@@ -245,7 +247,8 @@ export default async function WordleArchivePage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                )
+              })}
           </div>
 
           {/* SEO Content */}
