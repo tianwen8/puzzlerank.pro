@@ -6,6 +6,8 @@ Disallow: /api/
 Allow: /_next/static/
 Allow: /api/games/
 Allow: /todays-wordle-answer
+Allow: /wordle-archive
+Allow: /wordle/
 Allow: /daily-hints
 Allow: /
 Allow: /strategy
@@ -15,6 +17,9 @@ Crawl-delay: 1
 # 专门允许主要搜索引擎访问核心页面
 User-agent: Googlebot
 Allow: /
+Allow: /todays-wordle-answer
+Allow: /wordle-archive
+Allow: /wordle/
 Allow: /daily-hints
 Allow: /strategy
 Allow: /guide/
@@ -22,6 +27,9 @@ Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Allow: /todays-wordle-answer
+Allow: /wordle-archive
+Allow: /wordle/
 Allow: /daily-hints
 Allow: /strategy
 Allow: /guide/

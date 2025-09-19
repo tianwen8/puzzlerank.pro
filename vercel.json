@@ -2,16 +2,47 @@
   "crons": [
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "2 12 * * *"
+      "schedule": "5 12 * * *"
     },
     {
       "path": "/api/wordle/auto-collect",
-      "schedule": "0 13 * * *"
+      "schedule": "30 12 * * *"
+    },
+    {
+      "path": "/api/sitemap/update",
+      "schedule": "35 12 * * *"
     }
   ],
   "functions": {
     "app/api/wordle/auto-collect/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/sitemap/update/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/revalidate/route.ts": {
+      "maxDuration": 30
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap.xml"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=86400, stale-while-revalidate=43200"
+        }
+      ]
+    }
+  ]
 }

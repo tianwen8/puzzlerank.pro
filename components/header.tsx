@@ -151,6 +151,18 @@ export default function Header() {
                     <span>Daily Hints</span>
                   </Button>
                 </Link>
+                
+                {/* Wordle Answers Archive Button */}
+                <Link href="/wordle-answers">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center space-x-2 text-white/80 hover:text-white hover:bg-white/10 border border-white/20"
+                  >
+                    <FileText className="w-4 h-4 text-blue-400" />
+                    <span>Answers Archive</span>
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -287,6 +299,18 @@ export default function Header() {
               >
                 <Lightbulb className="w-4 h-4 text-yellow-400" />
                 <span>Daily Hints</span>
+              </Button>
+            </Link>
+            
+            {/* Mobile Wordle Answers Archive Button */}
+            <Link href="/wordle-answers" className="block">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full flex items-center justify-center space-x-2 text-white/80 hover:text-white hover:bg-white/10 border border-white/20"
+              >
+                <FileText className="w-4 h-4 text-blue-400" />
+                <span>Answers Archive</span>
               </Button>
             </Link>
           </div>

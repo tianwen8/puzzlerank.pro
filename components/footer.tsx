@@ -33,6 +33,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/wordle-answers" className="flex items-center space-x-2 hover:text-white transition-colors">
+                  <BookOpen className="w-3 h-3" />
+                  <span>Answers Archive</span>
+                </Link>
+              </li>
+              <li>
                 <a href="#leaderboard" className="flex items-center space-x-2 hover:text-white transition-colors">
                   <Trophy className="w-3 h-3" />
                   <span>Global Rankings</span>

@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
     const beijingMinute = beijingTime.getMinutes()
     
     // Calculate New Zealand time (NZST=UTC+12 in winter, NZDT=UTC+13 in summer)
-    // August is winter in NZ, so UTC+12
-    const nzTime = new Date(utcTime.getTime() + 12 * 60 * 60 * 1000)
+    // September is spring/summer in NZ, so UTC+13 (NZDT)
+    const nzTime = new Date(utcTime.getTime() + 13 * 60 * 60 * 1000)
     
     // Use New Zealand date as target date since Wordle releases at NZ midnight
     let targetDate = new Date(nzTime)
@@ -70,23 +70,13 @@ export async function GET(request: NextRequest) {
     
     if (!collectionResult.success) {
       console.log(`❌ Collection failed: ${collectionResult.error}`)
-      
-      // If it's early in the collection window (12:00-13:00 Beijing time), 
-      // this might be expected as the answer hasn't been published yet
-      if (beijingHour >= 12 && beijingHour <= 13) {
-        return NextResponse.json({
-          success: false,
-          error: 'Answer not yet available - will retry in 30 minutes',
-          details: collectionResult.error,
-          retryScheduled: true,
-          beijingTime: `${beijingHour}:${beijingMinute.toString().padStart(2, '0')}`
-        }, { status: 202 }) // 202 Accepted - processing but not complete
-      }
-      
+
       return NextResponse.json({
         success: false,
         error: 'Failed to collect from NYT Official API',
-        details: collectionResult.error
+        details: collectionResult.error,
+        nzTime: nzTime.toLocaleString('en-NZ', {timeZone: 'Pacific/Auckland'}),
+        beijingTime: `${beijingHour}:${beijingMinute.toString().padStart(2, '0')}`
       }, { status: 500 })
     }
     
@@ -152,6 +142,40 @@ export async function GET(request: NextRequest) {
       console.log(`➕ Inserted new game #${gameNumber} with answer: ${answer}`)
     }
     
+    // Trigger page regeneration and sitemap update for new data
+    const isNewData = !gameExists
+    if (isNewData) {
+      try {
+        console.log('🔄 Triggering page regeneration for new data...')
+
+        // Trigger cache revalidation for key pages
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || request.url.split('/api')[0]
+        await fetch(`${baseUrl}/api/revalidate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameNumber,
+            all: true // Revalidate all important pages
+          })
+        }).catch(error => {
+          console.warn('⚠️ Failed to trigger cache revalidation:', error.message)
+        })
+
+        // Trigger sitemap update
+        await fetch(`${baseUrl}/api/sitemap/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }).catch(error => {
+          console.warn('⚠️ Failed to trigger sitemap update:', error.message)
+        })
+
+        console.log('✅ Page regeneration and sitemap update triggered')
+      } catch (error) {
+        console.warn('⚠️ Post-collection tasks failed:', error)
+        // Don't fail the main collection process for these
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -161,7 +185,8 @@ export async function GET(request: NextRequest) {
         hints,
         action: gameExists ? 'updated' : 'inserted',
         source: 'NYT Official API',
-        beijingTime: `${beijingHour}:${beijingMinute.toString().padStart(2, '0')}`
+        beijingTime: `${beijingHour}:${beijingMinute.toString().padStart(2, '0')}`,
+        regenerationTriggered: isNewData
       },
       message: `🎉 Successfully collected and stored Wordle #${gameNumber} from NYT Official API`
     })
